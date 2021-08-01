@@ -15,7 +15,7 @@ import matplotlib.animation as animation
 
 
 import cv2
-img = cv2.imread('linje3.png',0)
+img = cv2.imread('linje4.png',0)
 img[img > 1] = 255
 
 where_pixels = np.where(img == 0)
@@ -61,7 +61,7 @@ def find_nearest(x,y, coords):
 
 a = give_nearest_coords(coords)
 linje1 = pd.DataFrame(a, columns=["x", "y"])
-linje1.to_csv("linje3.csv")
+linje1.to_csv("linje4.csv")
 
     
     

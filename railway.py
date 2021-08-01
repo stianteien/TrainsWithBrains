@@ -14,7 +14,7 @@ import pygame
 from pygame.locals import *
 
 class Railway:
-    def __init__(self, coords):
+    def __init__(self, coords, train_loop_strategy="loop"):
         self.coords = coords
         self.trains = []
         self.start = self.coords.loc[0]
@@ -22,19 +22,8 @@ class Railway:
         self.end_index = len(self.coords)-1
         self.start_index = 0
         
-        self.train_loop = "loop"
-        #self.end_strategi = self.start
-        
-        
-        
-        # self.frame = np.zeros((300, 500))
-        # for info,(x,y) in self.coords.iterrows():
-        #     self.frame[x,y] = 1
-        
-        #self.buss = cv.imread("buss.png")[:,:,0]
-        #self.buss[self.buss < 200] = 0
-        
-        #self.buss_coords = (self.coords.x[0], self.coords.y[0])
+        self.train_loop_strategy = train_loop_strategy
+
         
     def update_train(self, train):
         update_speed = 1
@@ -43,10 +32,12 @@ class Railway:
         if not self.end_strategi(train):
             # end not react - do update
             
+            train.find_speed()
             update_speed = train.moves_per_update
             train.real_position_index += update_speed * train.direction
             
-            train.position_index = int(np.floor(train.real_position_index))
+            #if train.real_position_index > 0: train.real_position_index = 0
+            train.position_index = int(np.round(train.real_position_index)) #kan klikke ettervert
             train.position = (self.coords.x[train.position_index],
                               self.coords.y[train.position_index])
             
@@ -56,7 +47,7 @@ class Railway:
         
     def end_strategi(self, train):
         # For loop-strategy
-        if self.train_loop == "loop":
+        if self.train_loop_strategy == "loop":
             if train.direction == 1: #  1 forward
                 # Check if end is end and return start
                 if train.real_position_index >= self.end_index:
@@ -65,7 +56,6 @@ class Railway:
                     train.position_index = self.start_index
                     return 1
                 
-                
             else: # -1 backwards
                 # Check if end is start and return end
                 if train.position_index <= self.start_index:
@@ -73,6 +63,16 @@ class Railway:
                     train.real_position_index = self.end_index
                     train.position_index = self.end_index
                     return 1
+            
+        # for line strategy
+        if self.train_loop_strategy == "line":
+            if train.real_position_index >= self.end_index \
+                    or train.real_position_index <= self.start_index: 
+                
+                if train.direction == 1:
+                    train.direction = -1
+                else:
+                    train.direction = 1
                 
                 
         

@@ -16,6 +16,7 @@ class SubwaySystem:
     def __init__(self):
         self.railways = []
         self.frame = np.zeros((600, 500))
+        self.done = False
         
         
     def add_railway(self, railway):
@@ -31,22 +32,30 @@ class SubwaySystem:
             for train in railway.trains:
                 
                 railway.update_train(train)
+                
+    def run_simualation(self):
+        while not self.done:
+            self.update()
+            time.sleep(1e-3)
+        
 
                                   
 
     
     def render(self):
+        pygame.font.init()
         width, height = 600, 500
         screen=pygame.display.set_mode((width, height))
         buss = pygame.image.load("redbus.png")
         surface = pygame.surfarray.make_surface(self.frame)
-        #self.buss_coords = (self.railways[0].coords.x[0], self.railways[0].coords.y[0])
-        
+       
         # add all train on the grid
         trains = []
         for railway in self.railways:
             for train in railway.trains:
-                trains.append((train, pygame.image.load("redbus.png")))
+                trains.append((train, 
+                               pygame.font.SysFont('Comic Sans MS', 20),
+                               pygame.image.load("redbus.png")))
                 
         
         while 1:
@@ -57,8 +66,12 @@ class SubwaySystem:
             screen.blit(surface,  (0,0))
             
             # add all trains
-            for train, train_bilde in trains:
+            for train, tekst, train_bilde in trains:
                 screen.blit(train_bilde, train.position)
+                screen.blit(tekst.render(str(np.round(train.speed))+" m/s", False, (255, 255, 255)), 
+                            (train.position[0], train.position[1]-25))
+            
+                
                 
             # 7 - update the screen
             pygame.display.update()

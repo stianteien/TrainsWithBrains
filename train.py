@@ -22,14 +22,24 @@ class Train:
         self.direction = direction # Forward (1) or backwards (-1)
         self.update_frequenze = 1e-3
         
-        self.moves_per_update = self.max_speed * self.update_frequenze
+        
+        #self.moves_per_update = self.max_speed * self.update_frequenze
         
     def find_speed(self):
-        pass
+        self.accelerate()
+        self.time_since_stop += 0.01
+        self.moves_per_update = self.speed * self.update_frequenze
         
-    def accelerate(self, tid):
-        
-        self.speed = self.max_speed/(1+self.max_speed*np.exp(-self.time_since_stop))
+    def accelerate(self):
+        x = self.time_since_stop # variabel
+        k = self.max_speed # constant
+        self.speed = k*x/(1*x+k*np.exp(-x))
     
     def deaccelarte(self):
-        pass
+        #x = self. # variabel TIME TILL STOP NOT LESS THAN 0
+        x = 0
+        if x <= 0: x = 0
+        k = self.max_speed # constant
+        self.speed = k*x/(1*x+k*np.exp(-x))
+        
+        
