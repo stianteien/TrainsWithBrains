@@ -9,18 +9,22 @@ import matplotlib.pyplot as plt
 import numpy as np
 import cv2 as cv
 import time
+import pandas as pd
 
 import pygame
 from pygame.locals import *
 
 class Railway:
-    def __init__(self, coords, train_loop_strategy="loop"):
+    def __init__(self, coords, stop_places=pd.DataFrame([]), 
+                 train_loop_strategy="loop"):
         self.coords = coords
         self.trains = []
         self.start = self.coords.loc[0]
         self.end = self.coords.loc[len(self.coords)-1]
         self.end_index = len(self.coords)-1
         self.start_index = 0
+        
+        self.stop_places = stop_places # Indexes as df
         
         self.train_loop_strategy = train_loop_strategy
 
@@ -32,6 +36,15 @@ class Railway:
         if not self.end_strategi(train):
             # end not react - do update
             
+            if not self.stop_places.empty:
+                self.give_stop_distances(train)
+                
+                # Start the train
+                if train.been_on_stop >= self.current_stop_place.stop_time:
+                    train.been_on_stop = 0
+                    train.real_position_index += 0.2 * train.direction
+            else:
+                train.distance_to_stopp += 0.01
             train.find_speed()
             update_speed = train.moves_per_update
             train.real_position_index += update_speed * train.direction
@@ -43,6 +56,30 @@ class Railway:
             
             
         
+    def give_stop_distances(self, train):
+        
+        b = train.real_position_index #pos of train 66.6    
+        a = self.stop_places.index.tolist() # steder å stoppe df with  x[10,70,100] y -.-
+        
+        idx = (np.abs(np.asarray(a) - b)).argmin()
+        nearest = a[idx]
+        self.current_stop_place = self.stop_places.iloc[idx].copy()
+        avstand = nearest - b
+        
+        avstand = avstand *  train.direction # Hvilken vei den kjører 1
+        #print(avstand)
+        train.distance_to_stopp = avstand
+        
+        if train.distance_to_stopp <= 0.1 and train.distance_to_stopp >= -0.1:
+            actives = [False for i in range(len(self.stop_places))]
+            actives[idx] = True
+            self.stop_places.active = actives
+        else:
+            self.stop_places.active = False
+        # return closest stop, (-) if behind, (+) if ahead
+        
+        #train.stop_distances
+        ##train.time_till_stop # Skal forandres
         
         
     def end_strategi(self, train):

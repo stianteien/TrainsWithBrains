@@ -54,22 +54,46 @@ class SubwaySystem:
         for railway in self.railways:
             for train in railway.trains:
                 trains.append((train, 
-                               pygame.font.SysFont('Comic Sans MS', 20),
+                               pygame.font.SysFont('Comic Sans MS', 13),
                                pygame.image.load("redbus.png")))
                 
+        # Add all stop places on grid
+        stop_places = []
+        for railway in self.railways:
+            for i, (x,y,stop_time, active) in railway.stop_places.iterrows():
+                if active:
+                    stop_bilde = pygame.image.load("stop_place_red.png")
+                else:
+                    stop_bilde = pygame.image.load("stop_place.png")  
+                stop_places.append((stop_bilde,
+                                   (x,y-38), active))
+                
         
-        while 1:
+                
+        
+        while not self.done:
             pygame.event.get() 
             # 5 - clear the screen before drawing it again
             screen.fill("white")
             # 6 - draw the screen elements
             screen.blit(surface,  (0,0))
             
+            # add all stopplaces
+            for railway in self.railways:
+                for i, (x,y,stop_time, active) in railway.stop_places.iterrows():
+                    #print(active)
+                    if active:
+                        stop_bilde = pygame.image.load("stop_place_red.png")
+                    else:
+                        stop_bilde = pygame.image.load("stop_place.png") 
+                    screen.blit(stop_bilde,
+                                (x,y-38))
+            
             # add all trains
             for train, tekst, train_bilde in trains:
                 screen.blit(train_bilde, train.position)
                 screen.blit(tekst.render(str(np.round(train.speed))+" m/s", False, (255, 255, 255)), 
-                            (train.position[0], train.position[1]-25))
+                            (train.position[0], train.position[1]-15))
             
                 
                 
