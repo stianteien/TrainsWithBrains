@@ -25,6 +25,13 @@ class SubwaySystem:
         for info,(x,y) in railway.coords.iterrows():
             self.frame[x,y] = 100
             
+    def find_intersections(self):
+        # Find for all stops
+        pass
+        
+        # Find for all lines
+        
+            
     def update(self):
         # Update all trains on all railways
         

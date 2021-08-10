@@ -19,8 +19,8 @@ linje4coords = pd.read_csv("linje4.csv", index_col=0)
 linje2stops = pd.concat([linje2coords[linje2coords.index==4] ,linje2coords.sample()])
 linje2stops[["stop_time", "active", "distance"]] = [[500,False, 0],[300, False, 0]]
 
-linje4stops = pd.concat([linje4coords.sample() ,linje4coords.sample()])
-linje4stops[["stop_time", "active", "distance"]] = [[500,False, 0],[300, False,0]]
+linje4stops = pd.concat([linje4coords.sample()])
+linje4stops[["stop_time", "active", "distance"]] = [[500,False, 0]]
 
 
 subwaysystem = SubwaySystem()
@@ -40,4 +40,6 @@ subwaysystem.add_railway(linje1)
 subwaysystem.add_railway(linje2)
 subwaysystem.add_railway(linje4)
 
+
+subwaysystem.find_intersections()
 subwaysystem.render()

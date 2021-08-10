@@ -50,7 +50,7 @@ class Train:
             self.speed = k*x/(x+k/c*np.exp(-a*x))     
         else:
             x = 0
-            self.speed = k*x/(x+k/c*np.exp(-a*x))
+            self.speed = 0#k*x/(x+k/c*np.exp(-a*x))
             self.been_on_stop += 1
             
     
