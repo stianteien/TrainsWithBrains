@@ -40,16 +40,17 @@ class Train:
     def accelerate(self):
         x = self.distance_to_stopp # variabel
         k = self.max_speed # constant
-        a = 1 #accelration
+        c = 5 # Other constat
+        a = 0.1 #accelration
         
         if self.distance_to_stopp >= 0.1: # -1 before stop and +1 after stop   
-            self.speed = k*x/(x+k*np.exp(-a*x))
+            self.speed = k*x/(x+k/c*np.exp(-a*x))
         elif self.distance_to_stopp <= -0.1: # deacs
             x = -x
-            self.speed = k*x/(x+k*np.exp(-a*x))            
+            self.speed = k*x/(x+k/c*np.exp(-a*x))     
         else:
             x = 0
-            self.speed = k*x/(x+k*np.exp(-a*x))
+            self.speed = k*x/(x+k/c*np.exp(-a*x))
             self.been_on_stop += 1
             
     
@@ -63,4 +64,4 @@ class Train:
             
         if x <= 6:
             if (k*x / (x+k*np.exp(-x))) < k:
-                self.speed = k*x/(1*x+k*np.exp(-x))
+                self.speed = k*x/(1*x+np.exp(-x))

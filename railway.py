@@ -58,16 +58,22 @@ class Railway:
         
     def give_stop_distances(self, train):
         
-        b = train.real_position_index #pos of train 66.6    
-        a = self.stop_places.index.tolist() # steder å stoppe df with  x[10,70,100] y -.-
         
-        idx = (np.abs(np.asarray(a) - b)).argmin()
+        b = np.array(train.position)
+        a = np.array([self.stop_places.x.tolist(), self.stop_places.y.tolist()]).T
+        self.stop_places["distance"] = np.linalg.norm(a-b, axis=1)
+        
+        #b = train.real_position_index #pos of train 66.6    
+        a = self.stop_places.distance.tolist() # steder å stoppe df with  x[10,70,100] y -.-
+        
+
+        idx = np.abs(a).argmin()
         nearest = a[idx]
         self.current_stop_place = self.stop_places.iloc[idx].copy()
-        avstand = nearest - b
+        avstand = nearest
         
         avstand = avstand *  train.direction # Hvilken vei den kjører 1
-        #print(avstand)
+        
         train.distance_to_stopp = avstand
         
         if train.distance_to_stopp <= 0.1 and train.distance_to_stopp >= -0.1:
@@ -103,8 +109,8 @@ class Railway:
             
         # for line strategy
         if self.train_loop_strategy == "line":
-            if train.real_position_index >= self.end_index \
-                    or train.real_position_index <= self.start_index: 
+            if train.real_position_index > self.end_index \
+                    or train.real_position_index < self.start_index: 
                 
                 if train.direction == 1:
                     train.direction = -1

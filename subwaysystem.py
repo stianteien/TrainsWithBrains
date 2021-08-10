@@ -30,7 +30,6 @@ class SubwaySystem:
         
         for railway in self.railways:
             for train in railway.trains:
-                
                 railway.update_train(train)
                 
     def run_simualation(self):
@@ -60,7 +59,7 @@ class SubwaySystem:
         # Add all stop places on grid
         stop_places = []
         for railway in self.railways:
-            for i, (x,y,stop_time, active) in railway.stop_places.iterrows():
+            for i, (x,y,stop_time, active,_) in railway.stop_places.iterrows():
                 if active:
                     stop_bilde = pygame.image.load("stop_place_red.png")
                 else:
@@ -80,7 +79,7 @@ class SubwaySystem:
             
             # add all stopplaces
             for railway in self.railways:
-                for i, (x,y,stop_time, active) in railway.stop_places.iterrows():
+                for i, (x,y,stop_time, active,_) in railway.stop_places.iterrows():
                     #print(active)
                     if active:
                         stop_bilde = pygame.image.load("stop_place_red.png")
