@@ -17,10 +17,10 @@ linje2coords = pd.read_csv("linje2.csv", index_col=0)
 linje4coords = pd.read_csv("linje4.csv", index_col=0)
 
 linje2stops = pd.concat([linje2coords[linje2coords.index==4] ,linje2coords.sample()])
-linje2stops[["stop_time", "active", "distance"]] = [[500,False, 0],[300, False, 0]]
+linje2stops[["stop_time", "active"]] = [[500,False],[300, False]]
 
 linje4stops = pd.concat([linje4coords.sample()])
-linje4stops[["stop_time", "active", "distance"]] = [[500,False, 0]]
+linje4stops[["stop_time", "active"]] = [[500,False]]
 
 
 subwaysystem = SubwaySystem()
@@ -32,8 +32,10 @@ linje4 = Railway(linje4coords, linje4stops, train_loop_strategy="line")
 
 # Add all trains
 linje1.add_train(Train())
-linje2.add_train(Train(direction = -1, max_speed = 100))
+linje2.add_train(Train(direction = 1, max_speed = 150))
+linje2.add_train(Train(direction = -1))
 linje4.add_train(Train())
+
 
 # Add lines inn system
 subwaysystem.add_railway(linje1)

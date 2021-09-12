@@ -44,7 +44,7 @@ class Railway:
                     train.been_on_stop = 0
                     train.real_position_index += 0.2 * train.direction
             else:
-                train.distance_to_stopp += 0.01
+                train.distance_to_stopp = train.max_speed
             train.find_speed()
             update_speed = train.moves_per_update
             train.real_position_index += update_speed * train.direction
@@ -61,31 +61,27 @@ class Railway:
         
         b = np.array(train.position)
         a = np.array([self.stop_places.x.tolist(), self.stop_places.y.tolist()]).T
-        self.stop_places["distance"] = np.linalg.norm(a-b, axis=1)
-        
-        #b = train.real_position_index #pos of train 66.6    
-        a = self.stop_places.distance.tolist() # steder å stoppe df with  x[10,70,100] y -.-
-        
+        distances = np.linalg.norm(a-b, axis=1)
 
-        idx = np.abs(a).argmin()
-        nearest = a[idx]
+        idx = np.abs(distances).argmin()
+        nearest = distances[idx]
+        
         self.current_stop_place = self.stop_places.iloc[idx].copy()
-        avstand = nearest
-        
-        avstand = avstand *  train.direction # Hvilken vei den kjører 1
-        
+        avstand = nearest * train.direction # Hvilken vei den kjører :) 
         train.distance_to_stopp = avstand
         
         if train.distance_to_stopp <= 0.1 and train.distance_to_stopp >= -0.1:
-            actives = [False for i in range(len(self.stop_places))]
+            # Train stops in stop place
+            actives = self.stop_places.active.tolist()
             actives[idx] = True
             self.stop_places.active = actives
+            #train.speed = 0 # Triks, kanskje ikke så bra
         else:
-            self.stop_places.active = False
+            actives = self.stop_places.active.tolist()
+            actives[idx] = False
+            self.stop_places.active = actives
         # return closest stop, (-) if behind, (+) if ahead
-        
-        #train.stop_distances
-        ##train.time_till_stop # Skal forandres
+
         
         
     def end_strategi(self, train):

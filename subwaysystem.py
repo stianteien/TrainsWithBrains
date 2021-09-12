@@ -21,15 +21,16 @@ class SubwaySystem:
         
     def add_railway(self, railway):
         self.railways.append(railway)
-        
-        for info,(x,y) in railway.coords.iterrows():
-            self.frame[x,y] = 100
+        self.frame[railway.coords.x, railway.coords.y] = 100
             
     def find_intersections(self):
-        # Find for all stops
+        # Find for all stops that are same
         pass
         
-        # Find for all lines
+        # Find for all lines that intersect
+        #for railway in self.railways:
+            
+        
         
             
     def update(self):
@@ -64,15 +65,15 @@ class SubwaySystem:
                                pygame.image.load("redbus.png")))
                 
         # Add all stop places on grid
-        stop_places = []
-        for railway in self.railways:
-            for i, (x,y,stop_time, active,_) in railway.stop_places.iterrows():
-                if active:
-                    stop_bilde = pygame.image.load("stop_place_red.png")
-                else:
-                    stop_bilde = pygame.image.load("stop_place.png")  
-                stop_places.append((stop_bilde,
-                                   (x,y-38), active))
+        # stop_places = []
+        # for railway in self.railways:
+        #     for i, (x,y,stop_time, active) in railway.stop_places.iterrows():
+        #         if active:
+        #             stop_bilde = pygame.image.load("stop_place_red.png")
+        #         else:
+        #             stop_bilde = pygame.image.load("stop_place.png")  
+        #         stop_places.append((stop_bilde,
+        #                            (x,y-38), active))
                 
         
                 
@@ -86,8 +87,9 @@ class SubwaySystem:
             
             # add all stopplaces
             for railway in self.railways:
-                for i, (x,y,stop_time, active,_) in railway.stop_places.iterrows():
-                    #print(active)
+                for i, (x,y,stop_time, active) in railway.stop_places.iterrows():
+
+                    # Prøv å blit kun ved forandring
                     if active:
                         stop_bilde = pygame.image.load("stop_place_red.png")
                     else:
@@ -98,7 +100,7 @@ class SubwaySystem:
             # add all trains
             for train, tekst, train_bilde in trains:
                 screen.blit(train_bilde, train.position)
-                screen.blit(tekst.render(str(np.round(train.speed))+" m/s", False, (255, 255, 255)), 
+                screen.blit(tekst.render(str(np.round(train.speed,0))+" m/s", False, (255, 255, 255)), 
                             (train.position[0], train.position[1]-15))
             
                 
@@ -111,7 +113,7 @@ class SubwaySystem:
             self.update()
             
 
-            time.sleep(1e-3)
+            #time.sleep(1e-3)
             
             for event in pygame.event.get():
                 
