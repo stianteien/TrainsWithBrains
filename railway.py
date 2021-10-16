@@ -44,7 +44,7 @@ class Railway:
                     train.been_on_stop = 0
                     train.real_position_index += 0.2 * train.direction
             else:
-                train.distance_to_stopp = train.max_speed
+                train.distance_to_stopp = train.max_speed*1000 # Bare for å få det stort
             train.find_speed()
             update_speed = train.moves_per_update
             train.real_position_index += update_speed * train.direction
@@ -68,14 +68,14 @@ class Railway:
         
         self.current_stop_place = self.stop_places.iloc[idx].copy()
         avstand = nearest * train.direction # Hvilken vei den kjører :) 
-        train.distance_to_stopp = avstand
+        train.distance_to_stopp = abs(avstand)
         
         if train.distance_to_stopp <= 0.1 and train.distance_to_stopp >= -0.1:
             # Train stops in stop place
             actives = self.stop_places.active.tolist()
             actives[idx] = True
             self.stop_places.active = actives
-            #train.speed = 0 # Triks, kanskje ikke så bra
+            train.speed = 0 # Triks, kanskje ikke så bra
         else:
             actives = self.stop_places.active.tolist()
             actives[idx] = False

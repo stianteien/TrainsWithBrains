@@ -41,7 +41,7 @@ class Train:
         # - Change speed
         
         
-        
+        #print(self.speed)
         self.desired_speed_stop_places()
         #self.desired_speed_collisons()
         self.change_speed()
@@ -53,24 +53,28 @@ class Train:
         
         x = self.distance_to_stopp # variabel
         k = self.max_speed # constant
-        c = 5 # Other constat
-        a = 1 #accelration
+        a = .05 #accelration
         
         if self.distance_to_stopp >= 0.2: # -1 before stop and +1 after stop   
             # Slow down
             #self.desired_speed = x
-        
-            self.desired_speed = k*x/(x+k/c*np.exp(-x))
+        # Rekker ikke å stoppe!
+            self.desired_speed = k*x/(x + k * np.exp(-x*a))
+            #self.desired_speed = k*x/(x+k/c*np.exp(-x*a))
+            #self.desired_speed = x*1
             
         elif self.distance_to_stopp <= -0.2: # deacs
             #self.desired_speed = -x
             x = -x
-            self.desired_speed = k*x/(x+k/c*np.exp(-x))     
+            self.desired_speed = k*x/(x + k * np.exp(-x*a))
+            #self.desired_speed = k*x/(x+k/c*np.exp(-x))     
         else:
             x = 0
-            self.speed = 0
+            #self.speed = 0
             self.desired_speed = 0#k*x/(x+k/c*np.exp(-a*x))
             self.been_on_stop += 1
+            
+        #print(self.desired_speed)
         
         
     def desired_speed_collisons(self):
@@ -85,20 +89,26 @@ class Train:
         
         current = self.speed
         desired = self.desired_speed
-        accs = 1
+        accs = 0.3
+        speed_change = 0.3
         random_factor = random.random()*0.06
         
-        
-        if desired > current:
+        #print(f"desired: {self.desired_speed:.2f}, speed: {self.speed:.2f}")
+        if np.isclose(self.desired_speed, self.speed, atol= speed_change*accs * 0.9):
+            #print(f"Same speed want yeah! current {current:.2f}, desired: {desired:.2f}\
+            #      {np.isclose(self.desired_speed, self.speed, 0.2)}")
+            self.speed = self.speed
+             
+        elif self.desired_speed > self.speed:
             # speed up
-            self.speed += 0.3 * accs - random_factor
+            #print(f"speeds up! current {current:.2f}, desired: {desired:.2f}")
+            self.speed += speed_change * accs - random_factor
             
-        elif desired < current:
+        elif self.desired_speed < self.speed:
             # speed down
-            self.speed -= 0.3 * accs + random_factor
+            #print(f"speeds down! current {current:.2f}, desired: {desired:.2f}")
+            self.speed -= speed_change * accs + random_factor
             
-        elif np.isclose(desired, current, 0.2):
-             self.speed = self.speed
         
             
     
