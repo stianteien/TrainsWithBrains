@@ -12,9 +12,9 @@ import pandas as pd
 import numpy as np
 import random
 
-linje1coords = pd.read_csv("linje1.csv", index_col=0)
-linje2coords = pd.read_csv("linje2.csv", index_col=0)
-linje4coords = pd.read_csv("linje4.csv", index_col=0)
+linje1coords = pd.read_csv("lines/linje1.csv", index_col=0)
+linje2coords = pd.read_csv("lines/linje2.csv", index_col=0)
+linje4coords = pd.read_csv("lines/linje4.csv", index_col=0)
 
 linje2stops = pd.concat([linje2coords[linje2coords.index==4] ,linje2coords.sample()])
 linje2stops[["stop_time", "active"]] = [[500,False],[300, False]]

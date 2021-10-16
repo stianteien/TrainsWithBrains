@@ -53,7 +53,7 @@ class SubwaySystem:
         pygame.font.init()
         width, height = 600, 500
         screen=pygame.display.set_mode((width, height))
-        buss = pygame.image.load("redbus.png")
+        buss = pygame.image.load("img/redbus.png")
         surface = pygame.surfarray.make_surface(self.frame)
        
         # add all train on the grid
@@ -62,7 +62,7 @@ class SubwaySystem:
             for train in railway.trains:
                 trains.append((train, 
                                pygame.font.SysFont('Comic Sans MS', 13),
-                               pygame.image.load("redbus.png")))
+                               pygame.image.load("img/redbus.png")))
                 
         # Add all stop places on grid
         # stop_places = []
@@ -91,16 +91,16 @@ class SubwaySystem:
 
                     # Prøv å blit kun ved forandring
                     if active:
-                        stop_bilde = pygame.image.load("stop_place_red.png")
+                        stop_bilde = pygame.image.load("img/stop_place_red.png")
                     else:
-                        stop_bilde = pygame.image.load("stop_place.png") 
+                        stop_bilde = pygame.image.load("img/stop_place.png") 
                     screen.blit(stop_bilde,
                                 (x,y-38))
             
             # add all trains
             for train, tekst, train_bilde in trains:
                 screen.blit(train_bilde, train.position)
-                screen.blit(tekst.render(str(np.round(train.speed,0))+" m/s", False, (255, 255, 255)), 
+                screen.blit(tekst.render(str(np.round(train.speed,0))+" k/h", False, (255, 255, 255)), 
                             (train.position[0], train.position[1]-15))
             
                 
