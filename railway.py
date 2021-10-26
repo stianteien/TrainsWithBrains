@@ -45,6 +45,7 @@ class Railway:
                     train.real_position_index += 0.2 * train.direction
             else:
                 train.distance_to_stopp = train.max_speed*1000 # Bare for å få det stort
+            
             train.find_speed()
             update_speed = train.moves_per_update
             train.real_position_index += update_speed * train.direction
