@@ -28,7 +28,11 @@ class Train:
         self.distance_to_stopp = 1
         self.been_on_stop = 0
         
+        self.start_position = 0
+        self.start_index = position_index
         
+        self.random_start_index = None
+        self.random_start_position = None
         
         
         #self.moves_per_update = self.max_speed * self.update_frequenze
@@ -42,7 +46,7 @@ class Train:
         
         
         #print(self.speed)
-        self.desired_speed_stop_places()
+        #self.desired_speed_stop_places()
         #self.desired_speed_collisons()
         self.change_speed()
         
@@ -86,6 +90,8 @@ class Train:
         # Current speed
         
         # Det skal varieres med max speed og ikke distanse to stop..!
+        if self.desired_speed > self.max_speed:
+            self.desired_speed = self.max_speed
         
         current = self.speed
         desired = self.desired_speed

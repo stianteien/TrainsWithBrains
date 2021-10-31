@@ -121,6 +121,13 @@ class Railway:
         train.position_index = train.position_index
         train.position = (self.coords.x[train.position_index],
                           self.coords.y[train.position_index])
+        train.start_index = train.position_index
+        train.start_position = train.position
+        
+        train.random_start_index = [0,10,20]
+        train.random_start_position = [(self.coords.x[index], 
+                                        self.coords.y[index])
+                                       for index in train.random_start_index]
         
 
        

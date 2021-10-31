@@ -11,6 +11,8 @@ from subwaysystem import SubwaySystem
 import pandas as pd
 import numpy as np
 import random
+from a2c import a2cAgent
+import tensorflow as tf
 
 linje1coords = pd.read_csv("lines/linje1.csv", index_col=0)
 linje2coords = pd.read_csv("lines/linje2.csv", index_col=0)
@@ -51,6 +53,52 @@ subwaysystem.add_railway(linje5)
 subwaysystem.add_railway(linje6)
 
 
+
+
 #subwaysystem.find_intersections()
 #subwaysystem.render()
 #subwaysystem.run_simualation()
+#subwaysystem.reset()
+
+
+# ========
+# Reinforance learning!
+# ========
+
+agent = a2cAgent(n_actions=2, input_dims=8, batch_size=64)
+r_history = []
+
+n_games = 3
+done = False
+max_interations = 300
+
+for i in range(n_games):
+    score = 0
+    o = 0
+    state, done = subwaysystem.reset()
+    
+    with tf.GradientTape() as tape:
+        
+        # Do action on env
+        while not done:
+            o += 1
+            action = agent.choose_action(state)
+            state, reward, done, _ = subwaysystem.step(action)
+            agent.reward_history.append(reward)
+            score += reward
+            
+            if o >= max_interations:
+                done = True
+            
+            
+        
+
+        # == Learn from action ==
+        agent.discount_reward()
+        agent.learn(tape)
+        
+        r_history.append(score)
+        
+        
+
+
