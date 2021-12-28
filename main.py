@@ -67,7 +67,7 @@ subwaysystem.add_railway(linje6)
 # ========
 
 agent = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
-                  epsilon=1.0, batch_size=64, input_dims=8)
+                  epsilon=1.0, batch_size=32, input_dims=8)
 r_history = []
 
 n_games = 1
@@ -102,8 +102,8 @@ for i in range(n_games):
         
         agent.remeber(state, action, reward, state_, done)
         
-        if np.random.random() > 0.2:
-            agent.learn()
+        #if np.random.random() > 0.2:
+        agent.learn()
         # Save all actions and hendelser
         #actions.append(action)
         #states.append(state)
