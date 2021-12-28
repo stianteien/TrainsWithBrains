@@ -11,7 +11,7 @@ import cv2 as cv
 import time
 import pandas as pd
 
-import pygame
+#import pygame
 from pygame.locals import *
 
 class Railway:

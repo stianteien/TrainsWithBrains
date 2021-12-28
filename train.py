@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+    # -*- coding: utf-8 -*-
 """
 Created on Tue Jul 27 22:05:22 2021
 
@@ -21,6 +21,7 @@ class Train:
         self.speed = 0
         self.max_speed = max_speed #moves/seconds
         self.desired_speed = self.max_speed
+        self.desired_action = 1
         
         self.direction = direction # Forward (1) or backwards (-1)
         self.update_frequenze = 1e-3
@@ -89,6 +90,29 @@ class Train:
         # Desired speed
         # Current speed
         
+        # self.desired_speed = 1 SPEED UP
+        # slef.desired_speed = 0 SPEED DOWN
+        
+        accs = 0.3
+        speed_change = 0.3
+        random_factor = random.random()*0.06
+        
+        #if self.speed < self.max_speed:
+            
+        if self.desired_action:
+            # Speed UP
+            self.speed += speed_change * accs - random_factor
+            if self.speed >= self.max_speed:
+                self.speed = self.max_speed
+        else:
+            # Speed DOWN
+            self.speed -= speed_change * accs + random_factor
+            if self.speed < 0:
+                self.speed = 0
+        #else:
+        #    self.speed = self.max_speed
+        
+        '''
         # Det skal varieres med max speed og ikke distanse to stop..!
         if self.desired_speed > self.max_speed:
             self.desired_speed = self.max_speed
@@ -115,7 +139,7 @@ class Train:
             #print(f"speeds down! current {current:.2f}, desired: {desired:.2f}")
             self.speed -= speed_change * accs + random_factor
             
-        
+        '''
             
     
     def deaccelarte(self):

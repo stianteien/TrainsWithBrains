@@ -27,6 +27,7 @@ class SubwaySystem:
         self.reward = None
         
         self.action_history = []
+        self.counter = 0 
         
     def add_railway(self, railway):
         self.railways.append(railway)
@@ -52,23 +53,22 @@ class SubwaySystem:
         # Check if trains is on the same position
         distances = pdist([train.position for train, _,_ in trains])
                      
-        if np.sort(distances)[0] < 50:
+        if np.sort(distances)[0] < 5:
             self.done = True
             print("Kræsj")
 
             
             
-    def update(self, action):
+    def update(self, actions):
         # Update all trains on all railways
-        
-        for (train, _,_) , speed in zip(self.trains, action):
-            train.desired_speed = speed
+        for (train, _,_) , action in zip(self.trains, actions[0]):
+            train.desired_action = action
         
         for railway in self.railways:
             for train in railway.trains:
                 railway.update_train(train)
                 
-        print([train.speed for train, _,_ in self.trains])
+        #print([train.speed for train, _,_ in self.trains])
                 
     def run_simualation(self):
         trains = []
@@ -103,16 +103,17 @@ class SubwaySystem:
         for train,_,_ in self.trains:
             self.state = np.append(self.state, [train.speed,
                                                 train.real_position_index,
-                                                train.desired_speed])
+                                                train.desired_action])
             distances = pdist([train.position for train, _,_ in self.trains])
             self.state = np.append(self.state, distances)
                 
         self.reward = 0
+        self.counter = 0 
         self.done = False
         return self.state, self.done
     
     
-    def step(self, action):
+    def step(self, actions):
         '''
         Parameters
         ----------
@@ -131,15 +132,15 @@ class SubwaySystem:
             extra information.
         '''
         #action - list of desired speed of all trains!
-        if len(self.action_history)>50:
-            if (self.action_history[-1] == np.mean(self.action_history[-50:], axis=0)).all():
-                action = np.array([100, 100])*np.random.rand(1,2)[0]
+        #if len(self.action_history)>50:
+        #    if (self.action_history[-1] == np.mean(self.action_history[-50:], axis=0)).all():
+        #        action = np.array([100, 100])*np.random.rand(1,2)[0]
         
         
         self.check_for_crash(self.trains)            
-        self.update(action)
+        self.update(actions)
 
-        self.action_history.append(action)
+        #self.action_history.append(action)
         #self.action_history = np.append(self.action_history, action)
         
         # =====
@@ -149,6 +150,7 @@ class SubwaySystem:
         # Gi tilbake posisjon for toget i koords og fart til toget? (1,3)?
         # Tog - (korrds, fart, avstand til andre?)
         # (koordx1, koordy1, fart1, avstand12, koordx2, ... osv)
+        # -->Reward kan bli fart + avstand
         self.reward = 0
         self.state = np.array([])
         for train,_,_ in self.trains:
@@ -158,14 +160,17 @@ class SubwaySystem:
             distances = pdist([train.position for train, _,_ in self.trains])
             self.state = np.append(self.state, distances)
             
-            self.reward += train.speed / 100
+            self.reward += train.speed + distances
         
-        return self.state, self.reward, self.done, self.info
+        self.counter += 1
+        #self.reward = self.reward - self.counter
+        
+        return self.state, self.reward/100, self.done, self.info
 
                                   
 
     
-    def render(self):
+    def render(self, agent):
         pygame.font.init()
         width, height = 300, 200
         screen=pygame.display.set_mode((width, height))
@@ -191,7 +196,7 @@ class SubwaySystem:
         #         stop_places.append((stop_bilde,
         #                            (x,y-38), active))
                 
-        
+        state, done = self.reset()
                 
         
         while True:
@@ -234,7 +239,9 @@ class SubwaySystem:
                 
                 
                 # 8 - Update all trains and their positons
-                self.update()
+                action = agent.choose_action(state)
+                state_, reward, done, info = self.step(action)
+                state = state_
             
             
 

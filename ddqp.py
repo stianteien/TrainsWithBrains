@@ -6,7 +6,7 @@ Created on Sat Feb  6 12:21:35 2021
 """
 
 from tensorflow.keras.layers import Dense, Activation, LSTM, Dropout, Input
-from tensorflow.keras.models import Sequential, load_model
+from tensorflow.keras.models import Sequential, load_model, Model
 from tensorflow.keras.optimizers import Adam
 import numpy as np
 
@@ -16,11 +16,11 @@ class ReplayBuffer(object):
         self.mem_size = max_size
         self.mem_cntr = 0
         self.discrete = discrete
-        self.state_memory = np.zeros((self.mem_size, input_shape[0], input_shape[1]))
-        self.new_state_memory = np.zeros((self.mem_size, input_shape[0], input_shape[1]))
+        self.state_memory = np.zeros((self.mem_size, input_shape))
+        self.new_state_memory = np.zeros((self.mem_size, input_shape))
         dtype = np.int8 if self.discrete else np.float32
         self.action_memory = np.zeros((self.mem_size, n_actions),
-                                      dtype=dtype)
+                                      dtype=np.object)
         self.reward_memory = np.zeros(self.mem_size)
         self.terminal_memory = np.zeros(self.mem_size, dtype=np.float32)
         
@@ -50,6 +50,16 @@ class ReplayBuffer(object):
         return states, actions, rewards, new_states, terminal
     
 def build_dqp(lr, n_actions, input_dims, fc1_dims, fc2_dims):
+    
+    inputs = Input(shape=input_dims)
+    x = Dense(64, activation='relu')(inputs)
+    x = Dense(64, activation='relu')(x)
+    
+    output1 = Dense(n_actions, activation='softmax')(x)
+    output2 = Dense(n_actions, activation='softmax')(x)
+    
+    model = Model(inputs=inputs, outputs=[output1, output2])
+    '''
     model = Sequential([
         
         Input(shape=input_dims),
@@ -65,15 +75,17 @@ def build_dqp(lr, n_actions, input_dims, fc1_dims, fc2_dims):
         #Dense(fc2_dims, activation='relu'),
         #Dense(n_actions)              
         ])
-    model.compile(optimizer=Adam(lr=lr), loss='mse')
+    
+    '''
+    model.compile(optimizer=Adam(lr=lr), loss='binary_crossentropy')
     return model
 
 class DDQNAgent(object):
-    def __init__(self, alpha, gamma, n_actions, speed, epsilon, batch_size,
+    def __init__(self, alpha, gamma, n_actions, max_speed, epsilon, batch_size,
                  input_dims, epsilon_dec=0.996, epsilon_end=0.01,
                  mem_size=1000000, fname='ddqn_model.h5', replace_target=100):
         self.n_actions = n_actions
-        self.speed = speed
+        self.max_speed = max_speed
         self.actions_space = [i for i in range(self.n_actions)]
         self.gamma = gamma
         self.epsilon = epsilon
@@ -82,7 +94,7 @@ class DDQNAgent(object):
         self.batch_size = batch_size
         self.model_name = fname
         self.replace_target = replace_target
-        self.memory = ReplayBuffer(mem_size, input_dims, n_actions, True)
+        self.memory = ReplayBuffer(mem_size, input_dims, n_actions, False)
         self.q_eval = build_dqp(alpha, n_actions, input_dims, 256, 256)
         self.q_target = build_dqp(alpha, n_actions, input_dims, 256, 256)
         
@@ -90,37 +102,72 @@ class DDQNAgent(object):
         self.memory.store_transition(state, action, reward, new_state, done)
         
     def choose_action(self, state):
-        # Train: Return two actions
+        # Train: Return actions
         state = state[np.newaxis, :]
         rand = np.random.random()
         if rand < self.epsilon:
+            #action = np.random.rand(1, self.n_actions) * self.max_speed
             #action = np.random.choice(self.actions_space)
-            action = np.random.rand(1, self.n_actions)[0]*self.speed
+            #action = np.random.rand(1, self.n_actions)[0]*self.speed
+            action = np.array([np.random.choice([1,1], self.n_actions)])
+            # Fiks actions her
         else:
-            actions = self.q_eval.predict(state)
-            action = np.argmax(actions)
+            action = self.q_eval.predict(state)
+            action = np.concatenate(action).argmax(axis=1)[np.newaxis,:]
+            #action = np.argmax(actions)
         
-        return actions
+        return action
     
     def learn(self):
         if self.memory.mem_cntr > self.batch_size:
             state, action, reward, new_state, done = \
                     self.memory.sample_buffer(self.batch_size)
-            action_values = np.array(self.actions_space, dtype=np.int8)
-            action_indices = np.dot(action, action_values)
+            #action_values = np.array(self.actions_space, dtype=np.int8)
+            #action_indices = np.dot(action, action_values)
+            action_indexes = action.argmax(axis=0)
+            action_indexes = action[:,1]
             
-            q_next = self.q_target.predict(new_state)
-            q_eval = self.q_eval.predict(new_state)
             
-            q_pred = self.q_eval.predict(state)
-            max_actions = np.argmax(q_eval, axis=1)
+            self.q_next = self.q_target.predict(new_state) #pred nye speed
+            self.q_eval1 = self.q_eval.predict(new_state)   #pred nye speed
             
-            self.q_target1 = q_pred
+            self.state = state
+            self.action = action
+            self.q_pred = self.q_eval.predict(state)       #pred speed
+            #max_actions = np.argmax(q_eval, axis=1)
+            
+            self.q_target1 = self.q_pred.copy()
             
             batch_index = np.arange(self.batch_size, dtype=np.int32)
             
-            self.q_target1[batch_index, action_indices] = reward + \
-                self.gamma*q_next[batch_index, max_actions.astype(int)]*done
+            # For loop alle togene (med hver sin handling)
+            for i in range(len(self.q_target1)):
+                self.max_actions = np.argmax(self.q_eval1[i], axis=1)
+            
+                # Første output i  modellen
+                self.q_target1[i][batch_index, list(action[:,i])] = reward + \
+                    self.gamma*self.q_next[i][batch_index, self.max_actions.astype(int)]*done
+            
+            
+            # Her læres det. Hva skal jeg anta er riktig?
+            # Reward er jo en pekepin
+            # q_target1 er det som skal være "riktig" - retning.
+            # Høy reward forandre lite
+            # Lav reward forandre mye - huber
+            
+            # Forsterke handling basert på reward!
+            
+            #self.q_target1[batch_index, :] = reward.reshape(reward.shape[0],1) + \
+            #    self.gamma*self.q_next[batch_index, :]
+            #self.q_target1[done == 0] = np.array([[0]*self.n_actions])
+            
+            #self.mod_reward = np.exp(-reward*0.01 + 4)
+            #self.mod_reward = self.mod_reward.reshape(self.mod_reward.shape[0],1)
+            
+            
+            #self.q_target1[batch_index, :] = self.mod_reward + \
+            #    self.gamma*q_next[batch_index, :]    # done fjernet
+            #self.q_target1[done == 0] = np.array([[0,0]])
             
             _ = self.q_eval.fit(state, self.q_target1, verbose=0)
             

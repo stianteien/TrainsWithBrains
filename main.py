@@ -11,8 +11,9 @@ from subwaysystem import SubwaySystem
 import pandas as pd
 import numpy as np
 import random
-from a2c import a2cAgent
+from ddqp import DDQNAgent
 import tensorflow as tf
+from scipy.spatial.distance import pdist, squareform
 
 linje1coords = pd.read_csv("lines/linje1.csv", index_col=0)
 linje2coords = pd.read_csv("lines/linje2.csv", index_col=0)
@@ -62,43 +63,77 @@ subwaysystem.add_railway(linje6)
 
 
 # ========
-# Reinforance learning!
+# Reinformant learning!
 # ========
 
-agent = a2cAgent(n_actions=2, input_dims=8, batch_size=64)
+agent = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
+                  epsilon=1.0, batch_size=64, input_dims=8)
 r_history = []
 
-n_games = 3
+n_games = 1
 done = False
-max_interations = 300
+max_interations = 2000
+
 
 for i in range(n_games):
     score = 0
     o = 0
     state, done = subwaysystem.reset()
     
-    with tf.GradientTape() as tape:
+    actions = []
+    states = []
+    states_ = []
+    rewards = []
+    dones = []
+    speeds = []
+    distances = []
         
         # Do action on env
-        while not done:
-            o += 1
-            action = agent.choose_action(state)
-            state, reward, done, _ = subwaysystem.step(action)
-            agent.reward_history.append(reward)
-            score += reward
+    while not done:
+        o += 1
+        action = agent.choose_action(state)
+        state_, reward, done, info = subwaysystem.step(action)
+        score += reward
+        
+        # Save things on the way
+        rewards.append(reward)
+        speeds.append([train.speed for train,_,_ in subwaysystem.trains])
+        distances.append(pdist([train.position for train,_,_ in subwaysystem.trains]))
+        
+        agent.remeber(state, action, reward, state_, done)
+        
+        if np.random.random() > 0.2:
+            agent.learn()
+        # Save all actions and hendelser
+        #actions.append(action)
+        #states.append(state)
+        #states_.append(state_)
+        #rewards.append(reward)
+        #dones.append(done)
+    
+        state = state_
+        
+        #if o>100:
+        #    break
+        if o%100 == 0:
+            print(o, [train.speed for train,_,_ in subwaysystem.trains])
             
-            if o >= max_interations:
-                done = True
+        if o>max_interations:
+            done = True
+            print("stopper pga maxinteretatoion")
             
+    
             
         
 
         # == Learn from action ==
-        agent.discount_reward()
-        agent.learn(tape)
+        #agent.discount_reward()
+        # agent.learn(tape)
         
-        r_history.append(score)
+        #r_history.append(score)
         
-        
+
+distances = np.array(distances)
+speeds = np.array(speeds)
 
 
