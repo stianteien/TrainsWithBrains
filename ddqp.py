@@ -77,7 +77,7 @@ def build_dqp(lr, n_actions, input_dims, fc1_dims, fc2_dims):
         ])
     
     '''
-    model.compile(optimizer=Adam(lr=lr), loss='binary_crossentropy')
+    model.compile(optimizer=Adam(learning_rate=lr), loss='binary_crossentropy')
     return model
 
 class DDQNAgent(object):

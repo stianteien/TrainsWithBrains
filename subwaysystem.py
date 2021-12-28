@@ -53,7 +53,7 @@ class SubwaySystem:
         # Check if trains is on the same position
         distances = pdist([train.position for train, _,_ in trains])
                      
-        if np.sort(distances)[0] < 5:
+        if np.sort(distances)[0] < 10:
             self.done = True
             print("Kræsj")
 
