@@ -105,7 +105,16 @@ class DDQNAgent(object):
         # Train: Return actions
         state = state[np.newaxis, :]
         rand = np.random.random()
-        if rand < self.epsilon:
+        
+        # epsilon < 0.3 --> speed up 
+        # epsilon > 0.3 --> random moments
+        
+        # Makes it speed up in the start
+        if self.epsilon > 0.7:
+            action = np.array([np.random.choice([0,1], self.n_actions)])
+        
+        elif rand < self.epsilon:
+
             #action = np.random.rand(1, self.n_actions) * self.max_speed
             #action = np.random.choice(self.actions_space)
             #action = np.random.rand(1, self.n_actions)[0]*self.speed
