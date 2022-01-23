@@ -161,6 +161,7 @@ class SubwaySystem:
             distances = pdist([train.position for train, _,_ in self.trains])
             self.state = np.append(self.state, distances)
             
+            print(distances)
             self.reward += train.speed + distances
         
         self.counter += 1
