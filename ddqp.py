@@ -109,7 +109,7 @@ class DDQNAgent(object):
             #action = np.random.rand(1, self.n_actions) * self.max_speed
             #action = np.random.choice(self.actions_space)
             #action = np.random.rand(1, self.n_actions)[0]*self.speed
-            action = np.array([np.random.choice([1,1], self.n_actions)])
+            action = np.array([np.random.choice([0,1], self.n_actions)])
             # Fiks actions her
         else:
             action = self.q_eval.predict(state)

@@ -151,6 +151,7 @@ class SubwaySystem:
         # Tog - (korrds, fart, avstand til andre?)
         # (koordx1, koordy1, fart1, avstand12, koordx2, ... osv)
         # -->Reward kan bli fart + avstand
+        # Må faktisk få det slik at dårlig handlinger gir mindre enn 1. 
         self.reward = 0
         self.state = np.array([])
         for train,_,_ in self.trains:
@@ -165,7 +166,7 @@ class SubwaySystem:
         self.counter += 1
         #self.reward = self.reward - self.counter
         
-        return self.state, self.reward/100, self.done, self.info
+        return self.state, self.reward/1000, self.done, self.info
 
                                   
 
