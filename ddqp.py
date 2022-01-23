@@ -111,7 +111,7 @@ class DDQNAgent(object):
         
         # Makes it speed up in the start
         if self.epsilon > 0.7:
-            action = np.array([np.random.choice([0,1], self.n_actions)])
+            action = np.array([np.random.choice([1,1], self.n_actions)])
         
         elif rand < self.epsilon:
 
