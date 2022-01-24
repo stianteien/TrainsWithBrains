@@ -138,9 +138,11 @@ class SubwaySystem:
         #    if (self.action_history[-1] == np.mean(self.action_history[-50:], axis=0)).all():
         #        action = np.array([100, 100])*np.random.rand(1,2)[0]
         
-        
-        self.check_for_crash(self.trains)            
-        self.update(actions)
+        # Do action many times
+        n = 10
+        for _ in range(n):
+            self.check_for_crash(self.trains)            
+            self.update(actions)
 
         #self.action_history.append(action)
         #self.action_history = np.append(self.action_history, action)
@@ -166,7 +168,7 @@ class SubwaySystem:
             distance_reward = (distances[0]-50) if (distances[0]-50)<0 else 0
             self.reward += train.speed + distance_reward
         
-        self.counter += 1
+        self.counter += n
         #self.reward = self.reward - self.counter
         
         return self.state, self.reward/100, self.done, self.info
@@ -197,8 +199,7 @@ class SubwaySystem:
     def generate_video(self):
         
 
-        subprocess.call('ffmpeg -framerate 60 -i movie/image_%05d.png\
-                        -r 30 -pix_fmt yuv420p movie.mp4')
+        subprocess.call('ffmpeg -framerate 60 -i movie/image_%05d.png -r 30 -pix_fmt yuv420p movie.mp4')
                         
                         
                         
