@@ -12,6 +12,8 @@ import time
 import collections
 import random
 from scipy.spatial.distance import pdist, squareform
+import subprocess
+from PIL import Image
 
 
 import pygame
@@ -168,8 +170,40 @@ class SubwaySystem:
         #self.reward = self.reward - self.counter
         
         return self.state, self.reward/100, self.done, self.info
+    
+    
+    def save_image(self, count):
+        image_frame = self.frame.copy()
+        
+        
+        for railway in self.railways:
+            for train in railway.trains:
+                x,y = train.position
+                image_frame = cv.circle(image_frame,
+                                        (y,x),
+                                        4, # Radius
+                                        100, # color
+                                        2) # thickness
+                
+        
+        
+        im = Image.fromarray(image_frame[120:180, 60:120]).convert('RGB')
+        im.save(f"movie/image_{count:05d}.png")
 
-                                  
+                
+        
+        #pygame.surfarray.array2d()
+    
+    def generate_video(self):
+        
+
+        subprocess.call('ffmpeg -framerate 60 -i movie/image_%05d.png\
+                        -r 30 -pix_fmt yuv420p movie.mp4')
+                        
+                        
+                        
+                        
+                        
 
     
     def render(self, agent):

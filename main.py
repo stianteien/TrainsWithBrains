@@ -113,6 +113,8 @@ for i in range(n_games):
     
         state = state_
         
+        subwaysystem.save_image(o)
+        
         #if o>100:
         #    break
         if o%100 == 0:
