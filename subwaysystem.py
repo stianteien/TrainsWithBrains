@@ -22,7 +22,7 @@ from pygame.locals import *
 class SubwaySystem:
     def __init__(self):
         self.railways = []
-        self.frame = np.zeros((300, 200))
+        self.frame = np.zeros((300, 200, 3))
         self.done = False
         self.state = None
         self.info = None
@@ -33,7 +33,7 @@ class SubwaySystem:
         
     def add_railway(self, railway):
         self.railways.append(railway)
-        self.frame[railway.coords.x, railway.coords.y] = 100
+        self.frame[railway.coords.x, railway.coords.y] = [255,255,255]
             
     def find_intersections(self):
         # Find for all stops that are same
@@ -183,12 +183,11 @@ class SubwaySystem:
                 image_frame = cv.circle(image_frame,
                                         (y,x),
                                         4, # Radius
-                                        100, # color
+                                        (255, 0, 0), # color
                                         2) # thickness
                 
         
-        
-        im = Image.fromarray(image_frame[120:180, 60:120]).convert('RGB')
+        im = Image.fromarray(image_frame.astype(np.uint8).transpose(1,0,2))
         im.save(f"movie/image_{count:05d}.png")
 
                 
@@ -198,7 +197,7 @@ class SubwaySystem:
     def generate_video(self):
         
 
-        subprocess.call('ffmpeg -framerate 60 -i movie/image_%05d.png -r 30 -pix_fmt yuv420p movie.mp4')
+        subprocess.call('ffmpeg -framerate 30 -i movie/image_%05d.png -r 60 -pix_fmt yuv420p movie.mp4')
                         
                         
                         

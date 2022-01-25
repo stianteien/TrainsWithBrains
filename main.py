@@ -90,30 +90,26 @@ for i in range(n_games):
         
         # Do action on env
     while not done:
-        o += 1
         action = agent.choose_action(state)
-        state_, reward, done, info = subwaysystem.step(action)
-        score += reward
+
+
+        n = 5
+        for _ in range(n):
+            o += 1
+            state_, reward, done, info = subwaysystem.step(action)
+            score += reward
+            
+            # Save things on the way
+            rewards.append(reward)
+            speeds.append([train.speed for train,_,_ in subwaysystem.trains])
+            distances.append(pdist([train.position for train,_,_ in subwaysystem.trains]))
+            agent.remeber(state, action, reward, state_, done)
+            
+            subwaysystem.save_image(o)
+            state = state_
+
         
-        # Save things on the way
-        rewards.append(reward)
-        speeds.append([train.speed for train,_,_ in subwaysystem.trains])
-        distances.append(pdist([train.position for train,_,_ in subwaysystem.trains]))
-        
-        agent.remeber(state, action, reward, state_, done)
-        
-        #if np.random.random() > 0.2:
         agent.learn()
-        # Save all actions and hendelser
-        #actions.append(action)
-        #states.append(state)
-        #states_.append(state_)
-        #rewards.append(reward)
-        #dones.append(done)
-    
-        state = state_
-        
-        subwaysystem.save_image(o)
         
         #if o>100:
         #    break
