@@ -72,7 +72,7 @@ r_history = []
 
 n_games = 1
 done = False
-max_interations = 2000
+max_interations = 5000
 
 
 for i in range(n_games):
