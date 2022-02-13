@@ -115,10 +115,13 @@ for i in range(n_games):
         #    break
         if o%100 == 0:
             print(o, [train.speed for train,_,_ in subwaysystem.trains], np.round(reward,3))
+        
+        if done:
+            print("krasj, , reward {sum(rewards)} ")
             
         if o>max_interations:
             done = True
-            print("stopper pga maxinteretatoion")
+            print(f"stopper pga maxinteretatoion, reward {sum(rewards)}")
             
     
             
