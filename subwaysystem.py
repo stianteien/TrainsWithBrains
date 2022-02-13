@@ -15,6 +15,9 @@ from scipy.spatial.distance import pdist, squareform
 import subprocess
 from PIL import Image
 
+import matplotlib
+matplotlib.use('Agg')
+
 
 import pygame
 from pygame.locals import *
@@ -164,7 +167,7 @@ class SubwaySystem:
             distances = pdist([train.position for train, _,_ in self.trains])
             self.state = np.append(self.state, distances)
             
-            distance_reward = (distances[0]-75) if (distances[0]-75)<0 else 0
+            distance_reward = (distances[0]-55) if (distances[0]-55)<0 else 0
             self.reward += train.speed + distance_reward
         
         self.counter += 1
@@ -187,8 +190,12 @@ class SubwaySystem:
                                         2) # thickness
                 
         
-        im = Image.fromarray(image_frame.astype(np.uint8).transpose(1,0,2))
-        im.save(f"movie/image_{count:05d}.png")
+        #im = Image.fromarray(image_frame.astype(np.uint8).transpose(1,0,2))
+        #im.save(f"movie/image_{count:05d}.png")
+        
+        
+        plt.imshow(image_frame)
+        plt.savefig(f"movie/image_{count:05d}.png")
 
                 
         
@@ -197,7 +204,7 @@ class SubwaySystem:
     def generate_video(self):
         
 
-        subprocess.call('ffmpeg -framerate 30 -i movie/image_%05d.png -r 60 -pix_fmt yuv420p movie.mp4')
+        subprocess.call('ffmpeg -framerate 60 -i movie/image_%05d.png -r 60 -pix_fmt yuv420p movie.mp4')
                         
                         
                         

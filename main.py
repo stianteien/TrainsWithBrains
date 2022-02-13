@@ -67,7 +67,7 @@ subwaysystem.add_railway(linje6)
 # ========
 
 agent = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
-                  epsilon=1.0, batch_size=32, input_dims=8)
+                  epsilon=1.0, batch_size=32, input_dims=8, epsilon_end=0.3)
 r_history = []
 
 n_games = 1
