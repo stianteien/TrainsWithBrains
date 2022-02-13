@@ -10,7 +10,7 @@ import random
 
 
 class Train:
-    def __init__(self, color = "red", max_speed = 100,
+    def __init__(self, color = "red", max_speed = 100, min_speed = 50,
                  position_index = 0, direction = 1):
         self.color = color
         self.position = None
@@ -20,6 +20,7 @@ class Train:
         
         self.speed = 0
         self.max_speed = max_speed #moves/seconds
+        self.min_speed = min_speed
         self.desired_speed = self.max_speed
         self.desired_action = 1
         
@@ -86,6 +87,27 @@ class Train:
         
         self.desired_speed = 100 
         
+    def speed_up(self):
+        accs = 0.3
+        speed_change = 0.3
+        random_factor = random.random()*0.06
+        
+        self.speed += speed_change * accs - random_factor
+        # Cap speed
+        if self.speed >= self.max_speed:
+                self.speed = self.max_speed
+        
+    def speed_down(self):
+        accs = 0.3
+        speed_change = 0.3
+        random_factor = random.random()*0.06
+        
+        self.speed -= speed_change * accs + random_factor
+        # Cap low speed
+        if self.speed < 0:
+            self.speed = 0
+        
+        
     def change_speed(self):
         # Desired speed
         # Current speed
@@ -93,22 +115,17 @@ class Train:
         # self.desired_speed = 1 SPEED UP
         # slef.desired_speed = 0 SPEED DOWN
         
-        accs = 0.3
-        speed_change = 0.3
-        random_factor = random.random()*0.06
-        
-        #if self.speed < self.max_speed:
-            
+
         if self.desired_action:
             # Speed UP
-            self.speed += speed_change * accs - random_factor
-            if self.speed >= self.max_speed:
-                self.speed = self.max_speed
+            self.speed_up()
+
         else:
             # Speed DOWN
-            self.speed -= speed_change * accs + random_factor
-            if self.speed < 0:
-                self.speed = 0
+            if self.speed < self.min_speed:
+                self.speed_up()
+            else:
+                self.speed_down()
         #else:
         #    self.speed = self.max_speed
         

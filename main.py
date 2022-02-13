@@ -42,8 +42,8 @@ linje1.add_train(Train())
 linje2.add_train(Train(direction = 1, max_speed = 150))
 linje2.add_train(Train(direction = -1))
 linje4.add_train(Train())
-linje5.add_train(Train())
-linje6.add_train(Train())
+linje5.add_train(Train(min_speed = 50))
+linje6.add_train(Train(min_speed = 70))
 
 
 # Add lines inn system

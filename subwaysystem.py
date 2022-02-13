@@ -168,7 +168,7 @@ class SubwaySystem:
             self.state = np.append(self.state, distances)
             
             distance_reward = (distances[0]-100) if (distances[0]-100)<0 else 0
-            self.reward += train.speed + distance_reward
+            self.reward += distance_reward
         
         self.counter += 1
         #self.reward = self.reward - self.counter
