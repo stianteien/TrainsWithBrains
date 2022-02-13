@@ -122,10 +122,7 @@ class Train:
 
         else:
             # Speed DOWN
-            if self.speed < self.min_speed:
-                self.speed_up()
-            else:
-                self.speed_down()
+            self.speed_down()
         #else:
         #    self.speed = self.max_speed
         

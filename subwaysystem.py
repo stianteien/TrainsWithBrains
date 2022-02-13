@@ -173,7 +173,7 @@ class SubwaySystem:
         self.counter += 1
         #self.reward = self.reward - self.counter
         
-        return self.state, self.reward/100, self.done, self.info
+        return self.state, self.reward/1000, self.done, self.info
     
     
     def save_image(self, count):
