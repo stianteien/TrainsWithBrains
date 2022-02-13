@@ -34,8 +34,8 @@ subwaysystem = SubwaySystem()
 linje1 = Railway(linje1coords)
 linje2 = Railway(linje2coords, linje2stops)
 linje4 = Railway(linje4coords, linje4stops, train_loop_strategy="line")
-linje5 = Railway(linje5coords, train_loop_strategy="line")
-linje6 = Railway(linje6coords, train_loop_strategy="line")
+linje5 = Railway(linje5coords, train_loop_strategy="loop")
+linje6 = Railway(linje6coords, train_loop_strategy="loop")
 
 # Add all trains
 linje1.add_train(Train())
