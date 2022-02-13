@@ -190,12 +190,12 @@ class SubwaySystem:
                                         2) # thickness
                 
         
-        #im = Image.fromarray(image_frame.astype(np.uint8).transpose(1,0,2))
-        #im.save(f"movie/image_{count:05d}.png")
+        im = Image.fromarray(image_frame.astype(np.uint8).transpose(1,0,2))
+        im.save(f"movie/image_{count:05d}.png")
         
         
-        plt.imshow(image_frame)
-        plt.savefig(f"movie/image_{count:05d}.png")
+        #plt.imshow(image_frame)
+        #plt.savefig(f"movie/image_{count:05d}.png")
 
                 
         
