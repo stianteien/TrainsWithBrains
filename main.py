@@ -114,7 +114,7 @@ for i in range(n_games):
         #if o>100:
         #    break
         if o%100 == 0:
-            print(o, [train.speed for train,_,_ in subwaysystem.trains])
+            print(o, [train.speed for train,_,_ in subwaysystem.trains], np.round(reward,3))
             
         if o>max_interations:
             done = True
