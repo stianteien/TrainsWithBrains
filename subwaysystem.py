@@ -167,13 +167,13 @@ class SubwaySystem:
             distances = pdist([train.position for train, _,_ in self.trains])
             self.state = np.append(self.state, distances)
             
-            distance_reward = (distances[0]-100) if (distances[0]-100)<0 else 0
+            distance_reward = dinstance[0]#(distances[0]-100) if (distances[0]-100)<0 else 0
             self.reward += distance_reward
         
         self.counter += 1
         #self.reward = self.reward - self.counter
         
-        return self.state, self.reward/1000, self.done, self.info
+        return self.state, self.reward/100, self.done, self.info
     
     
     def save_image(self, count):
