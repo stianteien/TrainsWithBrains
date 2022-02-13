@@ -70,7 +70,7 @@ agent = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
                   epsilon=1.0, batch_size=32, input_dims=8, epsilon_end=0.3)
 r_history = []
 
-n_games = 1
+n_games = 50
 done = False
 max_interations = 5000
 
@@ -113,11 +113,11 @@ for i in range(n_games):
         
         #if o>100:
         #    break
-        if o%100 == 0:
+        if o%300 == 0:
             print(o, [train.speed for train,_,_ in subwaysystem.trains], np.round(reward,3))
         
         if done:
-            print("krasj, , reward {sum(rewards)} ")
+            print(f"krasj, , reward {sum(rewards)} ")
             
         if o>max_interations:
             done = True
