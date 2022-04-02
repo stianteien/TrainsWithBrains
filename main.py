@@ -93,7 +93,7 @@ for i in range(n_games):
         action = agent.choose_action(state)
 
 
-        n = 5
+        n = 50
         for _ in range(n):
             o += 1
             state_, reward, done, info = subwaysystem.step(action)
