@@ -105,11 +105,11 @@ for i in range(n_games):
         
         #if o>100:
         #    break
-        if o%300 == 0:
-            print(o, [train.speed for train,_,_ in subwaysystem.trains], np.round(reward,3))
+        #if o%300 == 0:
+        #    print(o, [train.speed for train,_,_ in subwaysystem.trains], np.round(reward,3))
         
         if done:
-            print(f"krasj, , reward {sum(rewards)} ")
+            print(f"Collisions. Reward {sum(rewards)} ")
             
         if o>max_interations:
             done = True

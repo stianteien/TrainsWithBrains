@@ -64,7 +64,7 @@ class SubwaySystem:
         try:
             if np.sort(distances)[0] < 15:
                 self.done = True
-                print("Collison!")
+                #print("Collison!")
         except:
             pass
         
