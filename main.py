@@ -110,7 +110,7 @@ for i in range(n_games):
         #    print(o, [train.speed for train,_,_ in subwaysystem.trains], np.round(reward,3))
         
         if done:
-            print(f"Collisions. Reward {sum(rewards)} ")
+            print(f"Collisions. Reward: {round(sum(rewards),3)}. Last 10 mean: {round(np.mean(reward_h[:-10]),3)}")
             
         if o>max_interations:
             done = True
