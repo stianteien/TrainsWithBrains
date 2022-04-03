@@ -61,6 +61,7 @@ r_history = []
 n_games = 50
 done = False
 max_interations = 15000
+reward_h = []
 
 
 for i in range(n_games):
@@ -84,7 +85,7 @@ for i in range(n_games):
             action = agent.choose_action(state)
 
 
-        n = 5
+        n = 10
         for _ in range(n):
             o += 1
             state_, reward, done, info = subwaysystem.step(action)
@@ -113,7 +114,8 @@ for i in range(n_games):
             
         if o>max_interations:
             done = True
-            print(f"stopper pga maxinteretatoion, reward {sum(rewards)}")
+            reward_h.append(sum(rewards))
+            print(f"stopper pga maxinteretatoion, reward {round(sum(rewards),3). Last 10 mean: round(np.mean(reward_h[:-10]),3)}")
             
     
             
