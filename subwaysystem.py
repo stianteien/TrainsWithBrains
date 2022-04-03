@@ -16,16 +16,16 @@ import subprocess
 from PIL import Image
 
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 
 
 import pygame
 from pygame.locals import *
 
 class SubwaySystem:
-    def __init__(self):
+    def __init__(self, h=300, w=200):
         self.railways = []
-        self.frame = np.zeros((300, 200, 3))
+        self.frame = np.zeros((h, w, 3))
         self.done = False
         self.state = None
         self.info = None
@@ -33,6 +33,9 @@ class SubwaySystem:
         
         self.action_history = []
         self.counter = 0 
+        self.distances = []
+        
+        self.queue = []
         
     def add_railway(self, railway):
         self.railways.append(railway)
@@ -54,20 +57,47 @@ class SubwaySystem:
         #plt.imshow(self.frame, cmap="hot")
         #print(df_same)
         
-    def check_for_crash(self, trains):
+    def check_for_crash(self):
         # Check if trains is on the same position
-        distances = pdist([train.position for train, _,_ in trains])
-                     
-        if np.sort(distances)[0] < 10:
-            self.done = True
-            #print("Krasj")
+        distances = pdist([train.position for train, _,_ in self.trains])
+                  
+        try:
+            if np.sort(distances)[0] < 15:
+                self.done = True
+                print("Collison!")
+        except:
+            pass
+        
+        return np.sort(distances)[0]
 
+    def check_if_finish(self):
+        for railway in self.railways:
+            for train in railway.trains:
+                if np.array_equal(railway.end.values, np.array(train.position)):
+                    train.reached_end = True
+                    
+            # Overwrite all
+            #if train.reached_end:
+            #    train.desired_action = 0
+ 
+            
+        if all([t.reached_end for r in self.railways for t in r.trains]):
+            self.benchmark()
+            self.done = True
+            
+    def benchmark(self):
+        print(f"Benchmark - Used {self.counter} steps!")
+        
+        
             
             
     def update(self, actions):
         # Update all trains on all railways
-        for (train, _,_) , action in zip(self.trains, actions[0]):
-            train.desired_action = action
+        for (train, _,_) , action in zip(self.trains, actions):
+            if not train.reached_end: #Overwrite all if finish
+                train.desired_action = action
+            else:
+                train.desired_action = 0
         
         for railway in self.railways:
             for train in railway.trains:
@@ -75,8 +105,8 @@ class SubwaySystem:
                 
         #print([train.speed for train, _,_ in self.trains])
                 
-    def run_simualation(self):
-        trains = []
+    def run_simualation(self, agent=None):
+        #trains = []
         o = 0
         self.reset()
         
@@ -84,22 +114,30 @@ class SubwaySystem:
         while not self.done:
             o +=1    
             #self.step(action)
-            self.check_for_crash(self.trains)            
-            self.update()  
-            
-            if o % 1000 == 0:
-                print(o)
+            if agent:
+                action = agent.choose_action(state)
+                state_, reward, done, info = self.step(action)
+                state = state_
+            else:
+                action = self.logic_movement()
+                self.step(action)
+                
     
-    def reset(self):
+    def reset(self, random_start=False):
         self.trains = []
         self.action_history = []
+        self.distances = []
         o = 0
         for railway in self.railways:
             for train in railway.trains:
+                train.reached_end = False
                 self.trains.append((train, 0, 0))
                 
         for train, _, _ in self.trains:
-            index, train.position_index = random.choice(list(enumerate(train.random_start_index)))
+            if random_start:
+                index, train.position_index = random.choice(list(enumerate(train.random_start_index)))
+            else:
+                index, train.position_index = 0, 0
             train.position = train.random_start_position[index]
             train.real_position_index = train.position_index
             train.speed = 0
@@ -143,8 +181,11 @@ class SubwaySystem:
         
         # Do action many times
         
-        self.check_for_crash(self.trains)            
+        shortest_distance = self.check_for_crash()            
+        self.check_if_finish()
         self.update(actions)
+        
+        self.distances.append(shortest_distance)
 
         #self.action_history.append(action)
         #self.action_history = np.append(self.action_history, action)
@@ -175,6 +216,15 @@ class SubwaySystem:
         #self.reward = self.reward - self.counter
         
         return self.state, self.reward/100, self.done, self.info
+    
+    
+    def logic_movement(self):
+        
+        #distances = pdist([train.position for train, _,_ in self.trains])
+                     
+        #print(distances)
+        
+        return [1 for train, _,_ in self.trains]
     
     
     def save_image(self, count):
@@ -213,7 +263,7 @@ class SubwaySystem:
                         
 
     
-    def render(self, agent):
+    def render(self, agent=None):
         pygame.font.init()
         width, height = 300, 200
         screen=pygame.display.set_mode((width, height))
@@ -273,7 +323,7 @@ class SubwaySystem:
                     
                     
                 # Check for collisons
-                self.check_for_crash(trains)
+                #self.check_for_crash()
                 
     
                 
@@ -282,10 +332,13 @@ class SubwaySystem:
                 
                 
                 # 8 - Update all trains and their positons
-                action = agent.choose_action(state)
-                state_, reward, done, info = self.step(action)
-                state = state_
-            
+                if agent:
+                    action = agent.choose_action(state)
+                    state_, reward, done, info = self.step(action)
+                    state = state_
+                else:
+                    action = self.logic_movement()
+                    self.step(action)
             
 
             #time.sleep(1e-3)

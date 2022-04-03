@@ -36,6 +36,7 @@ class Train:
         self.random_start_index = None
         self.random_start_position = None
         
+        self.reached_end = False
         
         #self.moves_per_update = self.max_speed * self.update_frequenze
         

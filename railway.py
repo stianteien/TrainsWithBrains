@@ -67,16 +67,25 @@ class Railway:
         idx = np.abs(distances).argmin()
         nearest = distances[idx]
         
+        
         self.current_stop_place = self.stop_places.iloc[idx].copy()
         avstand = nearest * train.direction # Hvilken vei den kjører :) 
         train.distance_to_stopp = abs(avstand)
+        
+        # Slow down before stop
+        if train.speed * 0.6 > train.distance_to_stopp:
+            train.desired_action = 0
+        
+        
         
         if train.distance_to_stopp <= 0.1 and train.distance_to_stopp >= -0.1:
             # Train stops in stop place
             actives = self.stop_places.active.tolist()
             actives[idx] = True
             self.stop_places.active = actives
+            train.desired_action = 1 # Fjerner lagg i redering
             train.speed = 0 # Triks, kanskje ikke så bra
+            train.been_on_stop += 1
         else:
             actives = self.stop_places.active.tolist()
             actives[idx] = False

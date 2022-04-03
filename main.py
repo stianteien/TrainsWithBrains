@@ -14,46 +14,34 @@ import random
 from ddqp import DDQNAgent
 import tensorflow as tf
 from scipy.spatial.distance import pdist, squareform
-
-linje1coords = pd.read_csv("lines/linje1.csv", index_col=0)
-linje2coords = pd.read_csv("lines/linje2.csv", index_col=0)
-linje4coords = pd.read_csv("lines/linje4.csv", index_col=0)
-linje5coords = pd.read_csv("lines/linje5.csv", index_col=0)
-linje6coords = pd.read_csv("lines/linje6.csv", index_col=0)
-
-linje2stops = pd.concat([linje2coords[linje2coords.index==4] ,linje2coords.sample()])
-linje2stops[["stop_time", "active"]] = [[500,False],[300, False]]
-
-linje4stops = pd.concat([linje4coords.sample()])
-linje4stops[["stop_time", "active"]] = [[500,False]]
+import seaborn as sns
 
 
-subwaysystem = SubwaySystem()
+linje10coords = pd.read_csv("lines/linje10.csv", index_col=0)
+linje11coords = pd.read_csv("lines/linje11.csv", index_col=0)
+linje12coords = pd.read_csv("lines/linje12.csv", index_col=0)
 
-# Add all lines
-linje1 = Railway(linje1coords)
-linje2 = Railway(linje2coords, linje2stops)
-linje4 = Railway(linje4coords, linje4stops, train_loop_strategy="line")
-linje5 = Railway(linje5coords, train_loop_strategy="loop")
-linje6 = Railway(linje6coords, train_loop_strategy="loop")
+linje10stops = pd.concat([linje10coords[linje10coords.index==80]])
+linje10stops[["stop_time", "active"]] = [[100,False]]
 
-# Add all trains
-linje1.add_train(Train())
-linje2.add_train(Train(direction = 1, max_speed = 150))
-linje2.add_train(Train(direction = -1))
-linje4.add_train(Train())
-linje5.add_train(Train(min_speed = 50))
-linje6.add_train(Train(min_speed = 70))
+linje11stops = pd.concat([linje11coords[linje11coords.index==90]])
+linje11stops[["stop_time", "active"]] = [[150,False]]
 
 
-# Add lines inn system
-#subwaysystem.add_railway(linje1)
-#subwaysystem.add_railway(linje2)
-#subwaysystem.add_railway(linje4)
-subwaysystem.add_railway(linje5)
-subwaysystem.add_railway(linje6)
+subwaysystem = SubwaySystem(h=300, w=200)
+
+linje10 = Railway(linje10coords, linje10stops, train_loop_strategy="line")
+linje11 = Railway(linje11coords, linje11stops, train_loop_strategy="line")
+linje12 = Railway(linje12coords, train_loop_strategy="line")
 
 
+linje10.add_train(Train())
+linje11.add_train(Train())
+linje12.add_train(Train())
+
+subwaysystem.add_railway(linje10)
+subwaysystem.add_railway(linje11)
+subwaysystem.add_railway(linje12)
 
 
 #subwaysystem.find_intersections()
@@ -72,7 +60,7 @@ r_history = []
 
 n_games = 50
 done = False
-max_interations = 5000
+max_interations = 10000
 
 
 for i in range(n_games):
