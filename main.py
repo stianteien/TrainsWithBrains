@@ -111,13 +111,12 @@ for i in range(n_games):
         
         if done:
             reward_h.append(sum(rewards))
-            print(reward_h[:-10])
-            print(f"Collisions. Reward: {round(sum(rewards),3)}. Last 10 mean: {round(np.mean(reward_h[:-10]),3)}")
+            print(f"Collisions. Reward: {round(sum(rewards),3)}. Last 10 mean: {round(np.mean(reward_h[-10:]),3)}")
             
         if o>max_interations:
             done = True
             reward_h.append(sum(rewards))
-            print(f"stopper pga maxinteretatoion, reward {round(sum(rewards),3)}. Last 10 mean: {round(np.mean(reward_h[:-10]),3)}")
+            print(f"stopper pga maxinteretatoion, reward {round(sum(rewards),3)}. Last 10 mean: {round(np.mean(reward_h[-10:]),3)}")
             
     
             
