@@ -212,7 +212,6 @@ class SubwaySystem:
             self.reward += distance_reward
         
         self.counter += 1
-        print(self.counter)
         self.reward /= len(self.trains) # REMOVE WHEN NOT IN USE
         #self.reward = self.reward - self.counter
         
