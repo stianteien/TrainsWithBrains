@@ -21,17 +21,17 @@ linje10coords = pd.read_csv("lines/linje10.csv", index_col=0)
 linje11coords = pd.read_csv("lines/linje11.csv", index_col=0)
 linje12coords = pd.read_csv("lines/linje12.csv", index_col=0)
 
-linje10stops = pd.concat([linje10coords[linje10coords.index==80]])
-linje10stops[["stop_time", "active"]] = [[100,False]]
+#linje10stops = pd.concat([linje10coords[linje10coords.index==80]])
+#linje10stops[["stop_time", "active"]] = [[100,False]]
 
-linje11stops = pd.concat([linje11coords[linje11coords.index==90]])
-linje11stops[["stop_time", "active"]] = [[150,False]]
+#linje11stops = pd.concat([linje11coords[linje11coords.index==90]])
+#linje11stops[["stop_time", "active"]] = [[150,False]]
 
 
 subwaysystem = SubwaySystem(h=300, w=200)
 
-linje10 = Railway(linje10coords, linje10stops, train_loop_strategy="line")
-linje11 = Railway(linje11coords, linje11stops, train_loop_strategy="line")
+linje10 = Railway(linje10coords, train_loop_strategy="line")
+linje11 = Railway(linje11coords, train_loop_strategy="line")
 linje12 = Railway(linje12coords, train_loop_strategy="line")
 
 
@@ -60,7 +60,7 @@ r_history = []
 
 n_games = 50
 done = False
-max_interations = 10000
+max_interations = 15000
 
 
 for i in range(n_games):
@@ -78,10 +78,13 @@ for i in range(n_games):
         
         # Do action on env
     while not done:
-        action = agent.choose_action(state)
+        if o < 1000:
+            action = subwaysystem.logic_movement()
+        else:
+            action = agent.choose_action(state)
 
 
-        n = 50
+        n = 5
         for _ in range(n):
             o += 1
             state_, reward, done, info = subwaysystem.step(action)
@@ -91,13 +94,14 @@ for i in range(n_games):
             rewards.append(reward)
             speeds.append([train.speed for train,_,_ in subwaysystem.trains])
             distances.append(pdist([train.position for train,_,_ in subwaysystem.trains]))
-            agent.remeber(state, action, reward, state_, done)
+            if o>1000:
+                agent.remeber(state, action, reward, state_, done)
             
             subwaysystem.save_image(o)
             state = state_
 
-        
-        agent.learn()
+        if o>1001:
+            agent.learn()
         
         #if o>100:
         #    break

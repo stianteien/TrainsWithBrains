@@ -93,7 +93,7 @@ class SubwaySystem:
             
     def update(self, actions):
         # Update all trains on all railways
-        for (train, _,_) , action in zip(self.trains, actions):
+        for (train, _,_) , action in zip(self.trains, actions[0]):
             if not train.reached_end: #Overwrite all if finish
                 train.desired_action = action
             else:
@@ -212,6 +212,7 @@ class SubwaySystem:
             self.reward += distance_reward
         
         self.counter += 1
+        print(self.counter)
         self.reward /= len(self.trains) # REMOVE WHEN NOT IN USE
         #self.reward = self.reward - self.counter
         
@@ -224,7 +225,7 @@ class SubwaySystem:
                      
         #print(distances)
         
-        return [1 for train, _,_ in self.trains]
+        return [[1 for train, _,_ in self.trains]]
     
     
     def save_image(self, count):
