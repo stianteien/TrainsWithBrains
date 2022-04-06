@@ -59,6 +59,7 @@ agent = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
 r_history = []
 
 n_games = 50
+n_interact = 500
 done = False
 max_interations = 15000
 reward_h = []
@@ -79,7 +80,7 @@ for i in range(n_games):
         
         # Do action on env
     while not done:
-        if o < 1000:
+        if o < n_interact:
             action = subwaysystem.logic_movement()
         else:
             action = agent.choose_action(state)
@@ -95,13 +96,13 @@ for i in range(n_games):
             rewards.append(reward)
             speeds.append([train.speed for train,_,_ in subwaysystem.trains])
             distances.append(pdist([train.position for train,_,_ in subwaysystem.trains]))
-            if o>1000:
+            if o>n_interact:
                 agent.remeber(state, action, reward, state_, done)
             
             subwaysystem.save_image(o)
             state = state_
 
-        if o>1001:
+        if o>n_interact+1:
             agent.learn()
         
         #if o>100:
