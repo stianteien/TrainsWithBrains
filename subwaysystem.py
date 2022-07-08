@@ -94,10 +94,11 @@ class SubwaySystem:
     def update(self, actions):
         # Update all trains on all railways
         for (train, _,_) , action in zip(self.trains, actions[0]):
-            if not train.reached_end: #Overwrite all if finish
+            if not train.reached_end: #Overwrite all if finish - for intercetion test
                 train.desired_action = action
             else:
                 train.desired_action = 0
+            train.desired_action = action # just fix for keep the test above
         
         for railway in self.railways:
             for train in railway.trains:
@@ -209,11 +210,14 @@ class SubwaySystem:
             self.state = np.append(self.state, distances)
             
             distance_reward = distances[0]-25#(distances[0]-100) if (distances[0]-100)<0 else 0
-            self.reward += distance_reward
+            train.reward = (distance_reward + train.speed)/100/len(self.trains)
+            self.reward += distance_reward + train.speed
+            
+            # LAG TILHØRENDE REWARD FOR HVERT TOG / AGENT (07.06.22)
         
         self.counter += 1
         self.reward /= len(self.trains) # REMOVE WHEN NOT IN USE
-        self.reward = 1
+        #self.reward = 1
         #self.reward = self.reward - self.counter
         
         return self.state, self.reward/100, self.done, self.info

@@ -58,7 +58,7 @@ def build_dqp(lr, n_actions, input_dims, fc1_dims, fc2_dims):
     output1 = Dense(n_actions, activation='softmax')(x)
     output2 = Dense(n_actions, activation='softmax')(x)
     
-    model = Model(inputs=inputs, outputs=[output1, output2])
+    model = Model(inputs=inputs, outputs=[output1])
     '''
     model = Sequential([
         
@@ -110,20 +110,22 @@ class DDQNAgent(object):
         # epsilon > 0.3 --> random moments
         
         # Makes it speed up in the start
-        if self.epsilon > 0.7:
-            action = np.array([np.random.choice([1,1], self.n_actions)])
+        #if self.epsilon > 0.7:
+            #action = np.array([np.random.choice([1,1], self.n_actions)])
+        #    action = 1#np.random.choice(self.actions_space[-1])
         
-        elif rand < self.epsilon:
+        if rand < self.epsilon:
 
             #action = np.random.rand(1, self.n_actions) * self.max_speed
             #action = np.random.choice(self.actions_space)
             #action = np.random.rand(1, self.n_actions)[0]*self.speed
-            action = np.array([np.random.choice([0,1], self.n_actions)])
+            action = np.random.choice(self.actions_space)
+            #action = np.array([np.random.choice([0,1], self.n_actions)])
             # Fiks actions her
         else:
-            action = self.q_eval.predict(state)
-            action = np.concatenate(action).argmax(axis=1)[np.newaxis,:]
-            #action = np.argmax(actions)
+            actions = self.q_eval.predict(state)
+            #action = np.concatenate(action).argmax(axis=1)[np.newaxis,:]
+            action = np.argmax(actions)
         
         return action
     
@@ -131,52 +133,24 @@ class DDQNAgent(object):
         if self.memory.mem_cntr > self.batch_size:
             state, action, reward, new_state, done = \
                     self.memory.sample_buffer(self.batch_size)
-            #action_values = np.array(self.actions_space, dtype=np.int8)
-            #action_indices = np.dot(action, action_values)
-            action_indexes = action.argmax(axis=0)
-            action_indexes = action[:,1]
+                  
+            action_values = np.array(self.actions_space, dtype=np.int8)
+            action_indices = np.dot(action, action_values)
+            action_indices = np.array(action_indices, dtype=np.int8)
             
+            q_next = self.q_target.predict(new_state)
+            q_eval = self.q_eval.predict(new_state)
             
-            self.q_next = self.q_target.predict(new_state) #pred nye speed
-            self.q_eval1 = self.q_eval.predict(new_state)   #pred nye speed
+            q_pred = self.q_eval.predict(state)
+            max_actions = np.argmax(q_eval, axis=1)
             
-            self.state = state
-            self.action = action
-            self.q_pred = self.q_eval.predict(state)       #pred speed
-            #max_actions = np.argmax(q_eval, axis=1)
-            
-            self.q_target1 = self.q_pred.copy()
+            self.q_target1 = q_pred
             
             batch_index = np.arange(self.batch_size, dtype=np.int32)
+            self.ai = action_indices
             
-            # For loop alle togene (med hver sin handling)
-            for i in range(len(self.q_target1)):
-                self.max_actions = np.argmax(self.q_eval1[i], axis=1)
-            
-                # Første output i  modellen
-                self.q_target1[i][batch_index, list(action[:,i])] = reward + \
-                    self.gamma*self.q_next[i][batch_index, self.max_actions.astype(int)]*done
-            
-            
-            # Her læres det. Hva skal jeg anta er riktig?
-            # Reward er jo en pekepin
-            # q_target1 er det som skal være "riktig" - retning.
-            # Høy reward forandre lite
-            # Lav reward forandre mye - huber
-            
-            # Forsterke handling basert på reward!
-            
-            #self.q_target1[batch_index, :] = reward.reshape(reward.shape[0],1) + \
-            #    self.gamma*self.q_next[batch_index, :]
-            #self.q_target1[done == 0] = np.array([[0]*self.n_actions])
-            
-            #self.mod_reward = np.exp(-reward*0.01 + 4)
-            #self.mod_reward = self.mod_reward.reshape(self.mod_reward.shape[0],1)
-            
-            
-            #self.q_target1[batch_index, :] = self.mod_reward + \
-            #    self.gamma*q_next[batch_index, :]    # done fjernet
-            #self.q_target1[done == 0] = np.array([[0,0]])
+            self.q_target1[batch_index, action_indices] = reward + \
+                self.gamma*q_next[batch_index, max_actions.astype(int)]*done
             
             _ = self.q_eval.fit(state, self.q_target1, verbose=0)
             
@@ -185,6 +159,8 @@ class DDQNAgent(object):
                 
             if self.memory.mem_cntr % self.replace_target == 0:
                 self.update_network_parameters()
+            
+            
                 
     def update_network_parameters(self):
         self.q_target.set_weights(self.q_eval.get_weights())

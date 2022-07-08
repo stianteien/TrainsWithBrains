@@ -11,12 +11,15 @@ import random
 
 class Train:
     def __init__(self, color = "red", max_speed = 100, min_speed = 50,
-                 position_index = 0, direction = 1):
+                 position_index = 0, direction = 1, agent = None):
         self.color = color
         self.position = None
         self.position_index = position_index
         self.real_position_index = position_index # floating real pos
         self.time_since_stop = 0
+        
+        self.agent = agent # The brain
+        self.reward = 0
         
         self.speed = 0
         self.max_speed = max_speed #moves/seconds
