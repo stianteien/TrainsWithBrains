@@ -18,9 +18,9 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-linje10coords = pd.read_csv("lines/linje10.csv", index_col=0)
-linje11coords = pd.read_csv("lines/linje11.csv", index_col=0)
-linje12coords = pd.read_csv("lines/linje12.csv", index_col=0)
+linje7coords = pd.read_csv("lines/linje7.csv", index_col=0)
+linje8coords = pd.read_csv("lines/linje8.csv", index_col=0)
+#linje12coords = pd.read_csv("lines/linje12.csv", index_col=0)
 
 #linje10stops = pd.concat([linje10coords[linje10coords.index==80]])
 #linje10stops[["stop_time", "active"]] = [[100,False]]
@@ -31,17 +31,16 @@ linje12coords = pd.read_csv("lines/linje12.csv", index_col=0)
 
 subwaysystem = SubwaySystem(h=300, w=200)
 
-linje10 = Railway(linje10coords, train_loop_strategy="line")
-linje11 = Railway(linje11coords, train_loop_strategy="line")
-linje12 = Railway(linje12coords, train_loop_strategy="line")
+linje7 = Railway(linje7coords, train_loop_strategy="line")
+linje8 = Railway(linje8coords, train_loop_strategy="line")
 
 
-linje10.add_train(Train())
-linje11.add_train(Train())
-linje12.add_train(Train())
+linje7.add_train(Train())
+linje8.add_train(Train())
 
-subwaysystem.add_railway(linje10)
-subwaysystem.add_railway(linje11)
+
+subwaysystem.add_railway(linje7)
+subwaysystem.add_railway(linje8)
 #subwaysystem.add_railway(linje12)
 
 
@@ -57,20 +56,21 @@ subwaysystem.add_railway(linje11)
 # ========
 
 agent = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
-                  epsilon=1.0, batch_size=32, input_dims=8, epsilon_end=0.3)
+                  epsilon=1.0, batch_size=32, input_dims=4, epsilon_end=0.3)
 agent1 = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
                   epsilon=1.0, batch_size=32, input_dims=8, epsilon_end=0.3)
 
-linje10.trains[0].agent = agent
-linje11.trains[0].agent = agent1
+linje7.trains[0].agent = agent
+linje8.trains[0].agent = agent1
 
 r_history = []
 
-n_games = 10
+n_games = 40
 n_interact = 200
 done = False
-max_interations = 10000
+max_interations = 5000
 reward_h = []
+speeds_h = []
 
 
 for i in range(n_games):
@@ -91,8 +91,8 @@ for i in range(n_games):
         if o < n_interact:
             action = subwaysystem.logic_movement()
         else:
-            action0 = linje10.trains[0].agent.choose_action(state)
-            action1 = linje11.trains[0].agent.choose_action(state)
+            action0 = linje7.trains[0].agent.choose_action(linje7.trains[0].state)
+            action1 = 1#linje8.trains[0].agent.choose_action(state)
             
             action = [[action0, action1]]
             
@@ -104,29 +104,31 @@ for i in range(n_games):
         n = 25
         for _ in range(n):
             o += 1
+            save_state = linje7.trains[0].state
             state_, reward, done, info = subwaysystem.step(action)
             score += reward
             
             # Save things on the way
-            rewards.append([linje10.trains[0].reward,
-                            linje11.trains[0].reward])
+            rewards.append([linje7.trains[0].reward,
+                            linje8.trains[0].reward])
             speeds.append([train.speed for train,_,_ in subwaysystem.trains])
             distances.append(pdist([train.position for train,_,_ in subwaysystem.trains]))
             if o>n_interact:
-                linje10.trains[0].agent.remeber(state, action0, 
-                                                linje10.trains[0].reward,
-                                                state_, done)
-                linje11.trains[0].agent.remeber(state, action0, 
-                                                linje11.trains[0].reward,
-                                                state_, done)
+                linje7.trains[0].agent.remeber(save_state, action0, 
+                                                linje7.trains[0].reward,
+                                                linje7.trains[0].state, # <- new state_ (new state)
+                                                done)
+                #linje8.trains[0].agent.remeber(state, action0, 
+                #                                linje8.trains[0].reward,
+                #                                state_, done)
                 
             
             #subwaysystem.save_image(o)
             state = state_
 
         if o>n_interact+1:
-            linje10.trains[0].agent.learn()
-            linje11.trains[0].agent.learn()
+            linje7.trains[0].agent.learn()
+            #linje8.trains[0].agent.learn()
         
         #if o>100:
         #    break
@@ -144,7 +146,13 @@ for i in range(n_games):
             
     
             
-        
+    speeds_h.append(speeds)
+    plt.plot(np.array(speeds))
+    plt.title("speeds")
+    plt.show()
+    plt.plot(np.array(rewards))
+    plt.title("rewards")
+    plt.show()
 
         # == Learn from action ==
         #agent.discount_reward()
@@ -157,5 +165,12 @@ distances = np.array(distances)
 speeds = np.array(speeds)
 actions = np.array(actions).reshape(len(actions),2)
 rewards = np.array(rewards)
+speeds_h = np.array(speeds_h, dtype=object)
+
+
+
+#plt.plot(m[:,0])
+#plt.fill_between(m[:,0], m[:,0]+s[:,0], m[:,0]-s[:,0], alpha=0.5)
+
 
 

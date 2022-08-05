@@ -62,7 +62,7 @@ class SubwaySystem:
         distances = pdist([train.position for train, _,_ in self.trains])
                   
         try:
-            if np.sort(distances)[0] < 15:
+            if np.sort(distances)[0] < 10:
                 self.done = True
                 #print("Collison!")
         except:
@@ -77,8 +77,10 @@ class SubwaySystem:
                     train.reached_end = True
                     
             # Overwrite all
-            #if train.reached_end:
-            #    train.desired_action = 0
+            if train.reached_end:
+                self.done = True
+                print("Reached end.")
+                train.desired_action = 0
  
             
         if all([t.reached_end for r in self.railways for t in r.trains]):
@@ -86,19 +88,22 @@ class SubwaySystem:
             self.done = True
             
     def benchmark(self):
-        print(f"Benchmark - Used {self.counter} steps!")
+        print(f"Benchmark (all done) - Used {self.counter} steps!")
         
         
             
             
     def update(self, actions):
         # Update all trains on all railways
+        
+        # === INTERCETION TEST CODE ===
         for (train, _,_) , action in zip(self.trains, actions[0]):
             if not train.reached_end: #Overwrite all if finish - for intercetion test
                 train.desired_action = action
             else:
                 train.desired_action = 0
             train.desired_action = action # just fix for keep the test above
+        # === INTERCETION TEST END ===
         
         for railway in self.railways:
             for train in railway.trains:
@@ -143,13 +148,9 @@ class SubwaySystem:
             train.real_position_index = train.position_index
             train.speed = 0
             
-        self.state = np.array([])
-        for train,_,_ in self.trains:
-            self.state = np.append(self.state, [train.speed,
-                                                train.real_position_index,
-                                                train.desired_action])
-            distances = pdist([train.position for train, _,_ in self.trains])
-            self.state = np.append(self.state, distances)
+            
+        # Set the state    
+        self.set_state()
                 
         self.reward = 0
         self.counter = 0 
@@ -201,16 +202,11 @@ class SubwaySystem:
         # -->Reward kan bli fart + avstand
         # Må faktisk få det slik at dårlig handlinger gir mindre enn 1. 
         self.reward = 0
-        self.state = np.array([])
-        for train,_,_ in self.trains:
-            self.state = np.append(self.state, [train.speed,
-                                                train.real_position_index,
-                                                train.desired_speed])
+        self.set_state()
+        for train,_,_ in self.trains: 
             distances = pdist([train.position for train, _,_ in self.trains])
-            self.state = np.append(self.state, distances)
-            
             distance_reward = distances[0]-25#(distances[0]-100) if (distances[0]-100)<0 else 0
-            train.reward = (distance_reward + train.speed)/100/len(self.trains)
+            train.reward = (distance_reward + (train.speed-50))/100/len(self.trains) # train rewards!
             self.reward += distance_reward + train.speed
             
             # LAG TILHØRENDE REWARD FOR HVERT TOG / AGENT (07.06.22)
@@ -222,6 +218,18 @@ class SubwaySystem:
         
         return self.state, self.reward/100, self.done, self.info
     
+    def set_state(self):
+        # Setting the state for of the environment
+        self.state = np.array([])
+        for train,_,_ in self.trains:
+            train.state = np.array([])
+            train.state = np.append(train.state, [train.speed,
+                                                train.real_position_index,
+                                                train.desired_action])
+            distances = pdist([train.position for train, _,_ in self.trains])
+            train.state = np.append(train.state, distances)
+            self.state = np.append(self.state, train.state)
+        
     
     def logic_movement(self):
         
@@ -268,7 +276,7 @@ class SubwaySystem:
                         
 
     
-    def render(self, agent=None):
+    def render(self, agents=None):
         pygame.font.init()
         width, height = 300, 200
         screen=pygame.display.set_mode((width, height))
@@ -337,8 +345,8 @@ class SubwaySystem:
                 
                 
                 # 8 - Update all trains and their positons
-                if agent:
-                    action = agent.choose_action(state)
+                if agents:
+                    action = np.array([[agent.choose_action(state) for agent in agents]])
                     state_, reward, done, info = self.step(action)
                     state = state_
                 else:
