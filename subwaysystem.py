@@ -76,7 +76,7 @@ class SubwaySystem:
                 if np.array_equal(railway.end.values, np.array(train.position)):
                     train.reached_end = True
                     
-            # Overwrite all
+            # Overwrite all and ends episode
             if train.reached_end:
                 self.done = True
                 print("Reached end.")
@@ -96,7 +96,7 @@ class SubwaySystem:
     def update(self, actions):
         # Update all trains on all railways
         
-        # === INTERCETION TEST CODE ===
+        # === INTERCETION TEST CODE === Stops at end
         for (train, _,_) , action in zip(self.trains, actions[0]):
             if not train.reached_end: #Overwrite all if finish - for intercetion test
                 train.desired_action = action
