@@ -77,10 +77,10 @@ class SubwaySystem:
                     train.reached_end = True
                     
             # Overwrite all and ends episode
-            if train.reached_end:
-                self.done = True
-                print("Reached end.")
-                train.desired_action = 0
+            # if train.reached_end:
+            #     self.done = True
+            #     print("Reached end.")
+            #     train.desired_action = 0
  
             
         if all([t.reached_end for r in self.railways for t in r.trains]):
