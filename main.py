@@ -17,6 +17,8 @@ from scipy.spatial.distance import pdist, squareform
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+%matplotlib inline
+
 
 linje7coords = pd.read_csv("lines/linje7.csv", index_col=0)
 linje8coords = pd.read_csv("lines/linje8.csv", index_col=0)
