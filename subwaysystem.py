@@ -76,11 +76,11 @@ class SubwaySystem:
                 if np.array_equal(railway.end.values, np.array(train.position)):
                     train.reached_end = True
                     
-            # Overwrite all and ends episode
-            # if train.reached_end:
+            # Overwrite all to stop
+            if train.reached_end:
             #     self.done = True
             #     print("Reached end.")
-            #     train.desired_action = 0
+                 train.desired_action = 0
  
             
         if all([t.reached_end for r in self.railways for t in r.trains]):
