@@ -77,10 +77,10 @@ class SubwaySystem:
                     train.reached_end = True
                     
             # Overwrite all to stop
-            if train.reached_end:
+            #if train.reached_end:
             #     self.done = True
             #     print("Reached end.")
-                 train.desired_action = 0
+            #     train.desired_action = 0
  
             
         if all([t.reached_end for r in self.railways for t in r.trains]):
@@ -102,7 +102,7 @@ class SubwaySystem:
                 train.desired_action = action
             else:
                 train.desired_action = 0
-            train.desired_action = action # just fix for keep the test above
+            #train.desired_action = action # just fix for keep the test above
         # === INTERCETION TEST END ===
         
         for railway in self.railways:
@@ -183,7 +183,7 @@ class SubwaySystem:
         
         # Do action many times
         
-        shortest_distance = self.check_for_crash()            
+        shortest_distance = self.check_for_crash()      
         self.check_if_finish()
         self.update(actions)
         
@@ -215,6 +215,7 @@ class SubwaySystem:
         self.reward /= len(self.trains) # REMOVE WHEN NOT IN USE
         #self.reward = 1
         #self.reward = self.reward - self.counter
+        
         
         return self.state, self.reward/100, self.done, self.info
     

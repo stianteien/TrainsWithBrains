@@ -66,7 +66,7 @@ linje8.trains[0].agent = agent1
 
 r_history = []
 
-n_games = 40
+n_games = 10
 n_interact = 200
 done = False
 max_interations = 5000
@@ -103,7 +103,9 @@ for i in range(n_games):
 
 
         n = 25
-        for _ in range(n):
+        j = 0
+        while j<=n:
+        #for _ in range(n): # When done totally break out!
             o += 1
             save_state = linje7.trains[0].state
             state_, reward, done, info = subwaysystem.step(action)
@@ -115,7 +117,7 @@ for i in range(n_games):
             speeds.append([train.speed for train,_,_ in subwaysystem.trains])
             distances.append(pdist([train.position for train,_,_ in subwaysystem.trains]))
             if o>n_interact:
-                linje7.trains[0].agent.remeber(save_state, action0, 
+                linje7.trains[0].agent.remeber(save_state, action[0][0], 
                                                 linje7.trains[0].reward,
                                                 linje7.trains[0].state, # <- new state_ (new state)
                                                 done)
@@ -126,6 +128,15 @@ for i in range(n_games):
             
             #subwaysystem.save_image(o)
             state = state_
+            
+            # Update j
+            j += 1
+            
+            #Break out if done
+            if subwaysystem.done:
+                done = True
+                j = n + 1
+
 
         if o>n_interact+1:
             linje7.trains[0].agent.learn()
@@ -139,7 +150,7 @@ for i in range(n_games):
         if done:
             reward_h.append(np.sum(np.mean(np.array(rewards), axis=1)))
             #print(f"Collisions. Reward: {round(np.sum(np.mean(np.array(rewards), axis=1)),3)}. Last 10 mean: {round(np.mean(reward_h[-10:]),3)}")
-            print(f"Collision. Amount of steps: {subwaysystem.counter}")
+            print(f"Done. Amount of steps: {subwaysystem.counter}")
             
         if o>max_interations:
             done = True
