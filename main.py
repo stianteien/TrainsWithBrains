@@ -160,11 +160,13 @@ for i in range(n_games):
     
             
     speeds_h.append(speeds)
-    plt.plot(np.array(speeds))
-    plt.title("speeds")
-    plt.show()
-    plt.plot(np.array(rewards))
-    plt.title("rewards")
+    
+    fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
+    ax1.plot(np.array(speeds))
+    ax1.title.set_text('Speeds')
+    #plt.show()
+    ax2.plot(np.array(rewards))
+    ax2.title.set_text('Rewards')
     plt.show()
 
         # == Learn from action ==
