@@ -65,6 +65,7 @@ linje7.trains[0].agent = agent
 linje8.trains[0].agent = agent1
 
 r_history = []
+history = {"collison":[], "benchmark":[], "max_iter":[], "all": []}
 
 n_games = 100
 n_interact = 200
@@ -157,17 +158,23 @@ for i in range(n_games):
             reward_h.append(np.sum(np.mean(np.array(rewards), axis=1)))
             print(f"stopper pga maxinteretatoion, reward {round(np.sum(np.mean(np.array(rewards), axis=1)),3)}. Last 10 mean: {round(np.mean(reward_h[-10:]),3)}")
             print(f"Amount of steps: {subwaysystem.counter}")
+            subwaysystem.done_flag = "max_iter"
     
             
     speeds_h.append(speeds)
     
-    fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
-    ax1.plot(np.array(speeds))
-    ax1.title.set_text('Speeds')
+    # Save amount of steps.
+    history[subwaysystem.done_flag].append(subwaysystem.counter)
+    history["all"].append(subwaysystem.counter)
+    
+    
+    #fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
+    #ax1.plot(np.array(speeds))
+    #ax1.title.set_text('Speeds')
     #plt.show()
-    ax2.plot(np.array(rewards))
-    ax2.title.set_text('Rewards')
-    plt.show()
+    #ax2.plot(np.array(rewards))
+    #ax2.title.set_text('Rewards')
+    #plt.show()
 
         # == Learn from action ==
         #agent.discount_reward()
@@ -182,10 +189,8 @@ actions = np.array(actions).reshape(len(actions),2)
 rewards = np.array(rewards)
 speeds_h = np.array(speeds_h, dtype=object)
 
+print(history)
 
-
-#plt.plot(m[:,0])
-#plt.fill_between(m[:,0], m[:,0]+s[:,0], m[:,0]-s[:,0], alpha=0.5)
 
 
 

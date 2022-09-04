@@ -30,6 +30,7 @@ class SubwaySystem:
         self.state = None
         self.info = None
         self.reward = None
+        self.done_flag = None
         
         self.action_history = []
         self.counter = 0 
@@ -64,6 +65,7 @@ class SubwaySystem:
         try:
             if np.sort(distances)[0] < 10:
                 self.done = True
+                self.done_flag = "collison"
                 print("Collison!")
         except:
             pass
@@ -88,6 +90,7 @@ class SubwaySystem:
             self.done = True
             
     def benchmark(self):
+        self.done_flag = "benchmark"
         print(f"Benchmark (all done) - Used {self.counter} steps!")
         
         
