@@ -59,15 +59,15 @@ subwaysystem.add_railway(linje8)
 agent = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
                   epsilon=1.0, batch_size=32, input_dims=4, epsilon_end=0.3)
 agent1 = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
-                  epsilon=1.0, batch_size=32, input_dims=8, epsilon_end=0.3)
+                  epsilon=1.0, batch_size=32, input_dims=4, epsilon_end=0.3)
 
 linje7.trains[0].agent = agent
 linje8.trains[0].agent = agent1
 
 r_history = []
-history = {"collison":[], "benchmark":[], "max_iter":[], "all": []}
+history = []
 
-n_games = 100
+n_games = 10
 n_interact = 200
 done = False
 max_interations = 2200
@@ -94,7 +94,7 @@ for i in range(n_games):
             action = subwaysystem.logic_movement()
         else:
             action0 = linje7.trains[0].agent.choose_action(linje7.trains[0].state)
-            action1 = 1#linje8.trains[0].agent.choose_action(state)
+            action1 = linje8.trains[0].agent.choose_action(linje8.trains[0].state)
             
             action = [[action0, action1]]
             
@@ -108,7 +108,8 @@ for i in range(n_games):
         while j<=n:
         #for _ in range(n): # When done totally break out!
             o += 1
-            save_state = linje7.trains[0].state
+            save_state1 = linje7.trains[0].state 
+            save_state2 = linje8.trains[0].state
             state_, reward, done, info = subwaysystem.step(action)
             score += reward
             
@@ -118,13 +119,14 @@ for i in range(n_games):
             speeds.append([train.speed for train,_,_ in subwaysystem.trains])
             distances.append(pdist([train.position for train,_,_ in subwaysystem.trains]))
             if o>n_interact:
-                linje7.trains[0].agent.remeber(save_state, action[0][0], 
+                linje7.trains[0].agent.remeber(save_state1, action[0][0], 
                                                 linje7.trains[0].reward,
                                                 linje7.trains[0].state, # <- new state_ (new state)
                                                 done)
-                #linje8.trains[0].agent.remeber(state, action0, 
-                #                                linje8.trains[0].reward,
-                #                                state_, done)
+                linje8.trains[0].agent.remeber(save_state2, action[0][1], 
+                                                linje8.trains[0].reward,
+                                                linje8.trains[0].state,
+                                                done)
                 
             
             #subwaysystem.save_image(o)
@@ -140,8 +142,10 @@ for i in range(n_games):
 
 
         if o>n_interact+1:
-            linje7.trains[0].agent.learn()
-            #linje8.trains[0].agent.learn()
+            if not tlinje7.trains[0].reached_end):
+                linje7.trains[0].agent.learn()
+            if not tlinje8.trains[0].reached_end):
+                linje8.trains[0].agent.learn()
         
         #if o>100:
         #    break
@@ -164,17 +168,18 @@ for i in range(n_games):
     speeds_h.append(speeds)
     
     # Save amount of steps.
-    history[subwaysystem.done_flag].append(subwaysystem.counter)
-    history["all"].append(subwaysystem.counter)
+    history.append([subwaysystem.done_flag, i, subwaysystem.counter])
+    #history[subwaysystem.done_flag].append([i, subwaysystem.counter])
+    #history["all"].append(subwaysystem.counter)
     
     
-    #fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
-    #ax1.plot(np.array(speeds))
-    #ax1.title.set_text('Speeds')
+    fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
+    ax1.plot(np.array(speeds))
+    ax1.title.set_text('Speeds')
     #plt.show()
-    #ax2.plot(np.array(rewards))
-    #ax2.title.set_text('Rewards')
-    #plt.show()
+    ax2.plot(np.array(rewards))
+    ax2.title.set_text('Rewards')
+    plt.show()
 
         # == Learn from action ==
         #agent.discount_reward()
@@ -182,6 +187,20 @@ for i in range(n_games):
         
         #r_history.append(score)
         
+        
+
+# l = 0
+# for key in history:
+#     if len(history[key]) > l:
+#         l = len(history[key]) 
+# for key in history:
+#     if len(history[key]) <l:
+#         for i in range(int(l-len(history[key]))):
+#             history[key].append(None)
+
+df = pd.DataFrame(data=history, columns=["type", "i", "count"])
+sns.scatterplot(data=df, x="i", y="count", hue="type")
+
 
 distances = np.array(distances)
 speeds = np.array(speeds)
