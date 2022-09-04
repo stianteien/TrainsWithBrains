@@ -70,7 +70,7 @@ history = []
 n_games = 100
 n_interact = 200
 done = False
-max_interations = 2200
+max_interations = 2500
 reward_h = []
 speeds_h = []
 
