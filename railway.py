@@ -55,6 +55,10 @@ class Railway:
             train.position = (self.coords.x[train.position_index],
                               self.coords.y[train.position_index])
             
+        # Kill train speed
+        if train.reached_end:
+            train.speed = 0
+            
             
         
     def give_stop_distances(self, train):
