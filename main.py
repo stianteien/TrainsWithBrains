@@ -67,7 +67,7 @@ linje8.trains[0].agent = agent1
 r_history = []
 history = []
 
-n_games = 10
+n_games = 100
 n_interact = 200
 done = False
 max_interations = 2200
@@ -119,14 +119,16 @@ for i in range(n_games):
             speeds.append([train.speed for train,_,_ in subwaysystem.trains])
             distances.append(pdist([train.position for train,_,_ in subwaysystem.trains]))
             if o>n_interact:
-                linje7.trains[0].agent.remeber(save_state1, action[0][0], 
-                                                linje7.trains[0].reward,
-                                                linje7.trains[0].state, # <- new state_ (new state)
-                                                done)
-                linje8.trains[0].agent.remeber(save_state2, action[0][1], 
-                                                linje8.trains[0].reward,
-                                                linje8.trains[0].state,
-                                                done)
+                if not linje7.trains[0].reached_end:
+                    linje7.trains[0].agent.remeber(save_state1, action[0][0], 
+                                                    linje7.trains[0].reward,
+                                                    linje7.trains[0].state, # <- new state_ (new state)
+                                                    done)
+                if not linje8.trains[0].reached_end:
+                    linje8.trains[0].agent.remeber(save_state2, action[0][1], 
+                                                    linje8.trains[0].reward,
+                                                    linje8.trains[0].state,
+                                                    done)
                 
             
             #subwaysystem.save_image(o)
@@ -142,9 +144,9 @@ for i in range(n_games):
 
 
         if o>n_interact+1:
-            if not tlinje7.trains[0].reached_end):
+            if not linje7.trains[0].reached_end:
                 linje7.trains[0].agent.learn()
-            if not tlinje8.trains[0].reached_end):
+            if not linje8.trains[0].reached_end:
                 linje8.trains[0].agent.learn()
         
         #if o>100:
