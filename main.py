@@ -67,10 +67,10 @@ linje8.trains[0].agent = agent1
 r_history = []
 history = []
 
-n_games = 100
+n_games = 200
 n_interact = 200
 done = False
-max_interations = 2500
+max_interations = 3000
 reward_h = []
 speeds_h = []
 
