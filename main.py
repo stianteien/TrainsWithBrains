@@ -199,16 +199,16 @@ for i in range(n_games - counter.n[0]):
     
     
     #Save to file
-    if not counter.history_fname[0]:
-        print(f"Making a new file called")
+    if counter.n[0] == 0:
+        print(f"Making a new file")
         df = pd.DataFrame(data=history, columns=["type", "i", "count"])
-        df.to_csv(counter.history_fname)
+        df.to_csv(counter.history_fname[0])
         
     else:
         
-        df = pd.read_csv(counter.history_fname, index_col=0)
+        df = pd.read_csv(counter.history_fname[0], index_col=0)
         df.loc[len(df)] = history[-1]
-        df.to_csv(counter.history_fname)
+        df.to_csv(counter.history_fname[0])
     
     counter.n += 1
     counter.to_csv("counter.csv")
