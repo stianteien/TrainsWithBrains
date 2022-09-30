@@ -75,7 +75,7 @@ linje8.trains[0].agent = agent1
 r_history = []
 history = []
 
-n_games = 20
+n_games = counter.goal[0] + 1
 n_interact = 200
 done = False
 max_interations = 3000
