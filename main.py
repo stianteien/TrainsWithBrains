@@ -57,9 +57,15 @@ subwaysystem.add_railway(linje8)
 # ========
 
 agent = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
-                  epsilon=1.0, batch_size=32, input_dims=4, epsilon_end=0.3)
+                  epsilon=1.0, batch_size=32, input_dims=4, epsilon_end=0.3,
+                  fname='agent1.h5')
 agent1 = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
-                  epsilon=1.0, batch_size=32, input_dims=4, epsilon_end=0.3)
+                  epsilon=1.0, batch_size=32, input_dims=4, epsilon_end=0.3,
+                  fname='agent2.h5')
+
+#if 1:
+#    agent.load_model(agent.fname)
+#    agent1.load_model(agent1.fname)
 
 linje7.trains[0].agent = agent
 linje8.trains[0].agent = agent1
@@ -67,7 +73,7 @@ linje8.trains[0].agent = agent1
 r_history = []
 history = []
 
-n_games = 200
+n_games = 20
 n_interact = 200
 done = False
 max_interations = 3000
@@ -124,11 +130,13 @@ for i in range(n_games):
                                                     linje7.trains[0].reward,
                                                     linje7.trains[0].state, # <- new state_ (new state)
                                                     done)
+                    linje7.trains[0].agent.save_model(linje7.trains[0].agent.fname)
                 if not linje8.trains[0].reached_end:
                     linje8.trains[0].agent.remeber(save_state2, action[0][1], 
                                                     linje8.trains[0].reward,
                                                     linje8.trains[0].state,
                                                     done)
+                    linje8.trains[0].agent.save_model(linje8.trains[0].agent.fname)
                 
             
             #subwaysystem.save_image(o)
