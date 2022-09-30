@@ -84,6 +84,7 @@ class DDQNAgent(object):
     def __init__(self, alpha, gamma, n_actions, max_speed, epsilon, batch_size,
                  input_dims, epsilon_dec=0.996, epsilon_end=0.01,
                  mem_size=1000000, fname='ddqn_model.h5', replace_target=100):
+        self.fname = fname
         self.n_actions = n_actions
         self.max_speed = max_speed
         self.actions_space = [i for i in range(self.n_actions)]
