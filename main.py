@@ -66,6 +66,7 @@ agent1 = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
 counter = pd.read_csv("counter.csv", index_col = 0)
 
 if counter.n[0] < counter.goal[0] and counter.n[0] != 0:
+    print("Load models")
     agent.load_model(agent.fname)
     agent1.load_model(agent1.fname)
 
