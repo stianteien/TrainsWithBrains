@@ -206,7 +206,7 @@ for i in range(n_games - counter.n[0]):
         
     else:
         
-        df = pd.read_csv(counter.history_fname, inedx_col=0)
+        df = pd.read_csv(counter.history_fname, index_col=0)
         df.loc[len(df)] = history[-1]
         df.to_csv(counter.history_fname)
     
