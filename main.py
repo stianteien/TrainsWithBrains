@@ -181,9 +181,11 @@ for i in range(n_games):
     linje7.trains[0].agent.save_model(linje7.trains[0].agent.fname)
     linje8.trains[0].agent.save_model(linje8.trains[0].agent.fname)
     counter.n += 1
+    counter.to_csv("counter.csv")
     
     if counter.n[0] > counter.goal[0]:
-        counter.n = 0
+        counter.n = 0 
+        counter.to_csv("counter.csv")
         
     
     # Save amount of steps.
