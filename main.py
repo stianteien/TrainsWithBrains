@@ -65,6 +65,10 @@ agent1 = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
 
 counter = pd.read_csv("counter.csv", index_col = 0)
 
+if not counter.history_fname.any():
+    counter.history_fname = ["history-" + datetime.now().strftime('%Y%m%d-%H%M') + ".csv"]
+    print("Setting new fname")
+
 if counter.n[0] < counter.goal[0] and counter.n[0] != 0:
     print("Load models")
     agent.load_model(agent.fname)
@@ -178,21 +182,41 @@ for i in range(n_games - counter.n[0]):
     
             
     speeds_h.append(speeds)
-    print(f"{i+counter.n[0]} of {n_games}")
+    print(f"{counter.n[0]} of {n_games}")
     linje7.trains[0].agent.save_model(linje7.trains[0].agent.fname)
     linje8.trains[0].agent.save_model(linje8.trains[0].agent.fname)
+    
+    
+        
+
+        
+        
+    
+    # Save amount of steps.
+    history.append([subwaysystem.done_flag, counter.n[0], subwaysystem.counter])
+    #history[subwaysystem.done_flag].append([i, subwaysystem.counter])
+    #history["all"].append(subwaysystem.counter)
+    
+    
+    #Save to file
+    if not counter.history_fname[0]:
+        print(f"Making a new file called")
+        df = pd.DataFrame(data=history, columns=["type", "i", "count"])
+        df.to_csv(counter.history_fname)
+        
+    else:
+        
+        df = pd.read_csv(counter.history_fname, inedx_col=0)
+        df.loc[len(df)] = history[-1]
+        df.to_csv(counter.history_fname)
+    
     counter.n += 1
     counter.to_csv("counter.csv")
     
     if counter.n[0] > counter.goal[0]:
-        counter.n = 0 
+        counter.n = 0
+        counter.history_fname = [None]
         counter.to_csv("counter.csv")
-        
-    
-    # Save amount of steps.
-    history.append([subwaysystem.done_flag, i, subwaysystem.counter])
-    #history[subwaysystem.done_flag].append([i, subwaysystem.counter])
-    #history["all"].append(subwaysystem.counter)
     
     
     # fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
