@@ -63,9 +63,11 @@ agent1 = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
                   epsilon=1.0, batch_size=32, input_dims=4, epsilon_end=0.3,
                   fname='agent2.h5')
 
-#if 1:
-#    agent.load_model(agent.fname)
-#    agent1.load_model(agent1.fname)
+counter = pd.read_csv("counter.csv", index_col = 0)
+
+if counter.n[0] < counter.goal[0] and counter.n[0] != 0:
+    agent.load_model(agent.fname)
+    agent1.load_model(agent1.fname)
 
 linje7.trains[0].agent = agent
 linje8.trains[0].agent = agent1
@@ -178,6 +180,11 @@ for i in range(n_games):
     print(f"{i} of {n_games}")
     linje7.trains[0].agent.save_model(linje7.trains[0].agent.fname)
     linje8.trains[0].agent.save_model(linje8.trains[0].agent.fname)
+    counter.n += 1
+    
+    if counter.n[0] > counter.goal[0]:
+        counter.n = 0
+        
     
     # Save amount of steps.
     history.append([subwaysystem.done_flag, i, subwaysystem.counter])
