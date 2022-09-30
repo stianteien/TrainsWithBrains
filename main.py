@@ -130,13 +130,12 @@ for i in range(n_games):
                                                     linje7.trains[0].reward,
                                                     linje7.trains[0].state, # <- new state_ (new state)
                                                     done)
-                    linje7.trains[0].agent.save_model(linje7.trains[0].agent.fname)
                 if not linje8.trains[0].reached_end:
                     linje8.trains[0].agent.remeber(save_state2, action[0][1], 
                                                     linje8.trains[0].reward,
                                                     linje8.trains[0].state,
                                                     done)
-                    linje8.trains[0].agent.save_model(linje8.trains[0].agent.fname)
+                    
                 
             
             #subwaysystem.save_image(o)
@@ -177,6 +176,8 @@ for i in range(n_games):
             
     speeds_h.append(speeds)
     print(f"{i} of {n_games}")
+    linje7.trains[0].agent.save_model(linje7.trains[0].agent.fname)
+    linje8.trains[0].agent.save_model(linje8.trains[0].agent.fname)
     
     # Save amount of steps.
     history.append([subwaysystem.done_flag, i, subwaysystem.counter])
