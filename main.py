@@ -83,7 +83,7 @@ reward_h = []
 speeds_h = []
 
 
-for i in range(n_games):
+for i in range(n_games - counter.n[0]):
     score = 0
     o = 0
     state, done = subwaysystem.reset()
@@ -177,7 +177,7 @@ for i in range(n_games):
     
             
     speeds_h.append(speeds)
-    print(f"{i} of {n_games}")
+    print(f"{i+counter.n[0]} of {n_games}")
     linje7.trains[0].agent.save_model(linje7.trains[0].agent.fname)
     linje8.trains[0].agent.save_model(linje8.trains[0].agent.fname)
     counter.n += 1
