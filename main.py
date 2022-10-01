@@ -57,10 +57,10 @@ subwaysystem.add_railway(linje8)
 # ========
 
 agent = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
-                  epsilon=1.0, batch_size=32, input_dims=4, epsilon_end=0.3,
+                  epsilon=1.0, batch_size=32, input_dims=4, epsilon_end=0.03,
                   fname='agent1.h5')
 agent1 = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
-                  epsilon=1.0, batch_size=32, input_dims=4, epsilon_end=0.3,
+                  epsilon=1.0, batch_size=32, input_dims=4, epsilon_end=0.03,
                   fname='agent2.h5')
 
 counter = pd.read_csv("counter.csv", index_col = 0)
@@ -246,7 +246,7 @@ for i in range(n_games - counter.n[0]):
 
 df = pd.DataFrame(data=history, columns=["type", "i", "count"])
 sns.scatterplot(data=df, x="i", y="count", hue="type")
-
+#sns.lmplot(data=df, x="i", y="count", hue="type")
 
 distances = np.array(distances)
 speeds = np.array(speeds)
