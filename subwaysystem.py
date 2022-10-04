@@ -131,6 +131,11 @@ class SubwaySystem:
                 action = self.logic_movement()
                 self.step(action)
                 
+    def reorder_trains(self):
+        self.trains = []
+        for railway in self.railways:
+            for train in railway.trains:
+                self.trains.append((train, 0, 0))
     
     def reset(self, random_start=False):
         self.trains = []

@@ -21,6 +21,8 @@ class Train:
         self.agent = agent # The brain
         self.reward = 0
         self.state = 0
+        self.action = 0
+        self.save_state = [] # Save state
         
         self.speed = 0
         self.max_speed = max_speed #moves/seconds
