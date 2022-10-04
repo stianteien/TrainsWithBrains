@@ -167,31 +167,30 @@ class DDQNAgent(object):
         self.q_target.set_weights(self.q_eval.get_weights())
         
     def save_model(self, fname):
-        self.q_eval.save(fname)
-        # save epsiolon, save 
-        newpath = f'{fname}_mind' 
+        newpath = f'{fname[:-3]}_mind' 
         if not os.path.exists(newpath):
             os.makedirs(newpath)
             
-        np.save(f"{fname}_mind/epsilon.npy", self.epsilon)
-        np.save(f"{fname}_mind/state_memory.npy", self.memory.state_memory)
-        np.save(f"{fname}_mind/new_state_memory.npy", self.memory.new_state_memory)
-        np.save(f"{fname}_mind/action_memory.npy", self.memory.action_memory)
-        np.save(f"{fname}_mind/reward_memory.npy", self.memory.reward_memory)
-        np.save(f"{fname}_mind/terminal_memory.npy", self.memory.terminal_memory)
+        self.q_eval.save(f"{fname[:-3]}_mind/" + fname)
+        np.save(f"{fname[:-3]}_mind/epsilon.npy", self.epsilon)
+        np.save(f"{fname[:-3]}_mind/state_memory.npy", self.memory.state_memory)
+        np.save(f"{fname[:-3]}_mind/new_state_memory.npy", self.memory.new_state_memory)
+        np.save(f"{fname[:-3]}_mind/action_memory.npy", self.memory.action_memory)
+        np.save(f"{fname[:-3]}_mind/reward_memory.npy", self.memory.reward_memory)
+        np.save(f"{fname[:-3]}_mind/terminal_memory.npy", self.memory.terminal_memory)
             
     def load_model(self, fname):
-        self.q_eval = load_model(fname)
+        self.q_eval = load_model(f"{fname[:-3]}_mind/" + fname)
             
         if self.epsilon <= self.epsilon_min:
             self.update_network_parameters()
             
-        self.epsilon = np.load(f"{fname}_mind/epsilon.npy")
-        self.memory.state_memory = np.load(f"{fname}_mind/state_memory.npy")
-        self.memory.new_state_memory = np.load(f"{fname}_mind/new_state_memory.npy")
-        self.memory.action_memory = np.load(f"{fname}_mind/action_memory.npy", allow_pickle=True)
-        self.memory.reward_memory = np.load(f"{fname}_mind/reward_memory.npy")
-        self.memory.terminal_memory = np.load(f"{fname}_mind/terminal_memory.npy")
+        self.epsilon = np.load(f"{fname[:-3]}_mind/epsilon.npy")
+        self.memory.state_memory = np.load(f"{fname[:-3]}_mind/state_memory.npy")
+        self.memory.new_state_memory = np.load(f"{fname[:-3]}_mind/new_state_memory.npy")
+        self.memory.action_memory = np.load(f"{fname[:-3]}_mind/action_memory.npy", allow_pickle=True)
+        self.memory.reward_memory = np.load(f"{fname[:-3]}_mind/reward_memory.npy")
+        self.memory.terminal_memory = np.load(f"{fname[:-3]}_mind/terminal_memory.npy")
     
     
     
