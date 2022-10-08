@@ -14,6 +14,7 @@ import random
 from scipy.spatial.distance import pdist, squareform
 import subprocess
 from PIL import Image
+import itertools
 
 import matplotlib
 #matplotlib.use('Agg')
@@ -63,7 +64,7 @@ class SubwaySystem:
         distances = pdist([train.position for train, _,_ in self.trains])
                   
         try:
-            if np.sort(distances)[0] < 10:
+            if np.sort(distances)[0] < 5:
                 self.done = True
                 self.done_flag = "collison"
                 print("Collison!")
@@ -93,8 +94,87 @@ class SubwaySystem:
         self.done_flag = "benchmark"
         print(f"Benchmark (all done) - Used {self.counter} steps!")
         
+    
+    def do_benchmark(self, max_iter=3000, j=25):
+        '''
+        Does a brute force benchmark.
+        1 train is leader, the rest is variable.
+        Greedy approach: Find NOT collison point. Then speed up after that.
+        '''    
+        self.reorder_trains()
         
+        # find combination for all in max iter
+        steps = int(max_iter/j) # antall steps
+        
+        # Set all trains moves
+        self.trains[0][0].benchmark_moves = np.ones(steps)
+        self.trains[0][0].best_benchmark_moves = np.ones(steps)
+        for train,_,_ in self.trains[1:]:
+            train.benchmark_moves = np.zeros(steps)
+        
+        # Let one and one train do the benchmark
+        for train,_,_ in self.trains[1:]:
+            moves = np.array(list(itertools.combinations_with_replacement([1,0], steps)))
+
+            # Run sim till collsion
+            o = 0
+            for move in moves:
+                print(o)
+                _,_ = self.reset()
+                done = False
+                i = 0
+                train.benchmark_moves = move
+                while not done and i < len(move):
+                    for _ in range(j):
+                        actions = [train.benchmark_moves[i] for train,_,_ in self.trains] 
+                        _,_,done,_ = self.step([actions])
+                    i += 1
+                
+                if self.done_flag != 'collison' or self.done_flag == 'benchmark' or train.reached_end:
+                    print(f"Not crash at {o}, reorder moves.")
+                    break
+                o += 1
             
+            # Find last index with 1 as a value
+            move = moves[o,:o]
+            lastOneIx = np.where(move == 1)[0][-1]
+            move = moves[o,:lastOneIx]
+            last_moves = np.array(list(itertools.combinations_with_replacement([0,1], int(steps) - lastOneIx)))
+            
+            # Run sim backwards til collison and find best benchmark
+            o = 0
+            self.best_benchmark = 1e100
+            for last_move in last_moves:
+                move_track = np.concatenate([move, last_move],axis=0)
+                train.benchmark_moves = move_track
+                print(o)
+                _,_ = self.reset()
+                done = False
+                i = 0
+                while not done and i < len(move_track):
+                    for _ in range(j):
+                        actions = [train.benchmark_moves[i] for train,_,_ in self.trains] 
+                        _,_,done,_ = self.step([actions])
+                    i += 1
+                
+                if self.done_flag == 'collison':
+                    print("Stops benchmarking!")
+                    train.benchmark_moves = train.best_benchmark_moves
+                    break
+                    
+                if self.done_flag == 'benchmark' or train.reached_end:
+                    train.best_benchmark_moves = move_track
+                    self.best_benchmark = self.counter
+                    print("benchmark or reached_end")
+                o += 1
+                
+        self.all_moves_in_benchmark = []
+        for train,_,_ in self.trains:
+            self.all_moves_in_benchmark.append(train.best_benchmark_moves)
+        self.all_moves_in_benchmark = np.array(self.all_moves_in_benchmark)
+        
+                    
+
             
     def update(self, actions):
         # Update all trains on all railways
@@ -141,6 +221,7 @@ class SubwaySystem:
         self.trains = []
         self.action_history = []
         self.distances = []
+        self.done_flag = None
         o = 0
         for railway in self.railways:
             for train in railway.trains:
@@ -171,7 +252,7 @@ class SubwaySystem:
         Parameters
         ----------
         action : speed of all trains?
-            Action to be taken.
+            Action to be taken. [[0,0,1,...]]
 
         Returns
         -------
@@ -285,7 +366,7 @@ class SubwaySystem:
                         
 
     
-    def render(self, agents=None):
+    def render(self, agents=None, moves=None, j=25):
         pygame.font.init()
         width, height = 300, 200
         screen=pygame.display.set_mode((width, height))
@@ -313,7 +394,7 @@ class SubwaySystem:
                 
         state, done = self.reset()
                 
-        
+        o = 0
         while True:
             
             if not self.done:
@@ -358,6 +439,17 @@ class SubwaySystem:
                     action = np.array([[agent.choose_action(state) for agent in agents]])
                     state_, reward, done, info = self.step(action)
                     state = state_
+                elif len(moves) > 0:
+                    action = np.array([moves[:, o]])
+                    print(action, o)
+                    for _ in range(j):
+                        state_, reward, done, info = self.step(action)
+                        state = state_
+                    o += 1
+                    if o >= moves.shape[1]:
+                        self.done = True
+                    
+                    
                 else:
                     action = self.logic_movement()
                     self.step(action)

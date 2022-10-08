@@ -15,7 +15,7 @@ import matplotlib.animation as animation
 
 import cv2
 
-linename = "linje8"
+linename = "linje9"
 
 img = cv2.imread('lines/'+linename+'.png',0)
 img[img > 1] = 255

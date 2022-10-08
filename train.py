@@ -23,6 +23,8 @@ class Train:
         self.state = 0
         self.action = 0
         self.save_state = [] # Save state
+        self.benchmark_moves = None
+        self.best_benchmark_moves = None
         
         self.speed = 0
         self.max_speed = max_speed #moves/seconds

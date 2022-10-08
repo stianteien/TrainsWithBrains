@@ -21,7 +21,10 @@ from datetime import datetime
 
 linje7coords = pd.read_csv("lines/linje7.csv", index_col=0)
 linje8coords = pd.read_csv("lines/linje8.csv", index_col=0)
-#linje12coords = pd.read_csv("lines/linje12.csv", index_col=0)
+linje9coords = pd.read_csv("lines/linje9.csv", index_col=0)
+#linje10coords = pd.read_csv("lines/linje11.csv", index_col=0)
+#linje11coords = pd.read_csv("lines/linje11.csv", index_col=0)
+
 
 #linje10stops = pd.concat([linje10coords[linje10coords.index==80]])
 #linje10stops[["stop_time", "active"]] = [[100,False]]
@@ -30,19 +33,29 @@ linje8coords = pd.read_csv("lines/linje8.csv", index_col=0)
 #linje11stops[["stop_time", "active"]] = [[150,False]]
 
 
-subwaysystem = SubwaySystem(h=300, w=200)
 
 linje7 = Railway(linje7coords, train_loop_strategy="line")
 linje8 = Railway(linje8coords, train_loop_strategy="line")
+linje9 = Railway(linje9coords, train_loop_strategy="line")
+#linje10 = Railway(linje10coords, train_loop_strategy="line")
+#linje11 = Railway(linje11coords, train_loop_strategy="line")
 
 
 linje7.add_train(Train())
 linje8.add_train(Train())
+linje9.add_train(Train())
+# linje10.add_train(Train())
+# linje11.add_train(Train())
 
+
+
+subwaysystem = SubwaySystem(h=300, w=200)
 
 subwaysystem.add_railway(linje7)
 subwaysystem.add_railway(linje8)
-#subwaysystem.add_railway(linje12)
+subwaysystem.add_railway(linje9)
+# subwaysystem.add_railway(linje10)
+# subwaysystem.add_railway(linje11)
 
 
 #subwaysystem.find_intersections()
