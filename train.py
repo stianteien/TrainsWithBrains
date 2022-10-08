@@ -101,7 +101,7 @@ class Train:
         speed_change = 0.3
         random_factor = random.random()*0.06
         
-        self.speed += speed_change * accs - random_factor
+        self.speed += speed_change * accs #- random_factor
         # Cap speed
         if self.speed >= self.max_speed:
                 self.speed = self.max_speed
@@ -111,7 +111,7 @@ class Train:
         speed_change = 0.3
         random_factor = random.random()*0.06
         
-        self.speed -= speed_change * accs + random_factor
+        self.speed -= speed_change * accs #+ random_factor
         # Cap low speed
         if self.speed < 0:
             self.speed = 0

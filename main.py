@@ -118,12 +118,20 @@ for i in range(n_games - counter.n[0]):
     # Do action on env
     while not done:
         if o < n_interact:
-            action = subwaysystem.logic_movement()
+            action = []
+            for train,_,_ in subwaysystem.trains:
+                a = 1
+                action.append(a)
+                train.action = a
+                
+            action = [action]
+            
         else:
             action = []
             for train,_,_ in subwaysystem.trains:
-                action.append(train.agent.choose_action(train.state))
-                train.action = action
+                a = train.agent.choose_action(train.state)
+                action.append(a)
+                train.action = a
 
             action = [action]
             
