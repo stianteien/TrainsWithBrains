@@ -81,7 +81,7 @@ if not counter.history_fname.any():
 i = 0
 for train,_,_ in subwaysystem.trains:
     train.agent = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
-                                epsilon=1.0, batch_size=32, input_dims=4, epsilon_end=0.03,
+                                epsilon=1.0, batch_size=32, input_dims=6, epsilon_end=0.03,
                                 fname=f'agent{i}.h5')
         
     if counter.n[0] < counter.goal[0] and counter.n[0] != 0:
