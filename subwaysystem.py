@@ -294,7 +294,7 @@ class SubwaySystem:
         self.set_state()
         for train,_,_ in self.trains: 
             distances = pdist([train.position for train, _,_ in self.trains])
-            distance_reward = distances[0]-25#(distances[0]-100) if (distances[0]-100)<0 else 0
+            distance_reward = distances[0]-50#(distances[0]-100) if (distances[0]-100)<0 else 0
             train.reward = (distance_reward + (train.speed-50))/100/len(self.trains) # train rewards!
             self.reward += distance_reward + train.speed
             
