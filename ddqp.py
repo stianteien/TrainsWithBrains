@@ -89,6 +89,7 @@ class DDQNAgent(object):
         self.max_speed = max_speed
         self.actions_space = [i for i in range(self.n_actions)]
         self.gamma = gamma
+        self.history = None
         self.epsilon = epsilon
         self.epsilon_dec = epsilon_dec
         self.epsilon_min = epsilon_end
@@ -153,7 +154,7 @@ class DDQNAgent(object):
             self.q_target1[batch_index, action_indices] = reward + \
                 self.gamma*q_next[batch_index, max_actions.astype(int)]*done
             
-            _ = self.q_eval.fit(state, self.q_target1, verbose=0)
+            self.history = self.q_eval.fit(state, self.q_target1, verbose=0)
             
             self.epsilon = self.epsilon*self.epsilon_dec if self.epsilon > \
                 self.epsilon_min else self.epsilon_min

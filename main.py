@@ -78,6 +78,7 @@ if not counter.history_fname.any():
 
 
 # Add brain to all trains
+names = []
 i = 0
 for train,_,_ in subwaysystem.trains:
     train.agent = DDQNAgent(alpha=0.005, gamma=0.99, n_actions=2, max_speed=100,
@@ -89,7 +90,9 @@ for train,_,_ in subwaysystem.trains:
         train.agent.load_model(train.agent.fname)            
             
     i+=1
+    names.append(train.agent.fname)
 
+losses_h = pd.DataFrame([], columns=names)
 
 r_history = []
 history = []
@@ -114,6 +117,7 @@ for i in range(n_games - counter.n[0]):
     dones = []
     speeds = []
     distances = []
+    losses = {name:[] for name in names}
         
     # Do action on env
     while not done:
@@ -179,11 +183,18 @@ for i in range(n_games - counter.n[0]):
                 done = True
                 j = n + 1
 
-
+        loss = {}
         if o>n_interact+1:
             for train,_,_ in subwaysystem.trains:
                 if not train.reached_end:
                     train.agent.learn()
+                    if train.agent.history:
+                        loss[train.agent.fname] = train.agent.history.history["loss"][0]
+                        #loss.append(train.agent.history.history["loss"][0])
+        if loss:
+            for train,_,_ in subwaysystem.trains:
+                losses[train.agent.fname].append(loss[train.agent.fname])
+            #losses.append(loss)
         
         #if o>100:
         #    break
@@ -202,14 +213,33 @@ for i in range(n_games - counter.n[0]):
             print(f"Amount of steps: {subwaysystem.counter}")
             subwaysystem.done_flag = "max_iter"
     
+    #losses = np.array(losses)
+    # Adds to none to loss
+    longest_list_key = max(losses, key= lambda x: len(set(losses[x])))
+    longest_list = len(losses[longest_list_key])
+    
+    for loss_key in losses.keys():
+        if len(losses[loss_key]) < longest_list:
+            losses[loss_key].extend([None]*(longest_list - len(losses[loss_key])))
             
+    df = pd.DataFrame(losses)
+    
+    
+    losses_h.append(np.array(losses))
     speeds_h.append(speeds)
     print(f"{counter.n[0]} of {n_games-1}")
     for train,_,_ in subwaysystem.trains:
         train.agent.save_model(train.agent.fname)  
     
-
-        
+    
+    #Plot speed, rewards and loss
+    fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, ncols=1, figsize=(10,10))
+    ax1.plot(rewards); ax1.set_title("Rewards")
+    ax2.plot(speeds); ax2.set_title("Speeds")
+    ax3.plot(df); ax3.set_title("Losses")
+    plt.show()
+    
+      
     
     # Save amount of steps.
     history.append([subwaysystem.done_flag, counter.n[0], subwaysystem.counter])
