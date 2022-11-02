@@ -125,7 +125,7 @@ class DDQNAgent(object):
             #action = np.array([np.random.choice([0,1], self.n_actions)])
             # Fiks actions her
         else:
-            actions = self.q_eval.predict(state)
+            actions = self.q_eval.predict(state, verbose=0)
             #action = np.concatenate(action).argmax(axis=1)[np.newaxis,:]
             action = np.argmax(actions)
         
@@ -140,10 +140,10 @@ class DDQNAgent(object):
             action_indices = np.dot(action, action_values)
             action_indices = np.array(action_indices, dtype=np.int8)
             
-            q_next = self.q_target.predict(new_state)
-            q_eval = self.q_eval.predict(new_state)
+            q_next = self.q_target.predict(new_state, verbose=0)
+            q_eval = self.q_eval.predict(new_state, verbose=0)
             
-            q_pred = self.q_eval.predict(state)
+            q_pred = self.q_eval.predict(state, verbose=0)
             max_actions = np.argmax(q_eval, axis=1)
             
             self.q_target1 = q_pred
