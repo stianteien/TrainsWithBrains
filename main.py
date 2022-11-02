@@ -225,7 +225,7 @@ for i in range(n_games - counter.n[0]):
     df = pd.DataFrame(losses)
     
     
-    losses_h.append(np.array(losses))
+    #losses_h.append(np.array(losses))
     speeds_h.append(speeds)
     print(f"{counter.n[0]} of {n_games-1}")
     for train,_,_ in subwaysystem.trains:
