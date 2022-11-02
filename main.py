@@ -192,8 +192,11 @@ for i in range(n_games - counter.n[0]):
                         loss[train.agent.fname] = train.agent.history.history["loss"][0]
                         #loss.append(train.agent.history.history["loss"][0])
         if loss:
-            for train,_,_ in subwaysystem.trains:
-                losses[train.agent.fname].append(loss[train.agent.fname])
+            for key in loss.keys():
+                losses[key].append(loss[key])
+                
+            #for train,_,_ in subwaysystem.trains:
+            #    losses[train.agent.fname].append(loss[train.agent.fname])
             #losses.append(loss)
         
         #if o>100:
