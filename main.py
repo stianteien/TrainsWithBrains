@@ -167,10 +167,11 @@ for i in range(n_games - counter.n[0]):
             if o>n_interact:
                 for train,_,_ in subwaysystem.trains:
                     if not train.reached_end:
-                        train.agent.remeber(train.save_state, train.action, 
-                                                    train.reward,
-                                                    train.state, # <- new state_ (new state)
-                                                    done)
+                        train.agent.remeber(train.save_state, 
+                                            train.action, 
+                                            train.reward,
+                                            train.state, # <- new state_ (new state)
+                                            done)
                     
             
             #subwaysystem.save_image(o)
@@ -193,6 +194,7 @@ for i in range(n_games - counter.n[0]):
                         loss[train.agent.fname] = train.agent.history.history["loss"][0]
                         #loss.append(train.agent.history.history["loss"][0])
         if loss:
+            print(f"loss: {loss}")
             for key in loss.keys():
                 losses[key].append(loss[key])
                 

@@ -298,7 +298,7 @@ class SubwaySystem:
             train.reward = (distance_reward + (train.speed-50))/100/len(self.trains) # train rewards!
             self.reward += distance_reward + train.speed
             
-            # LAG TILHØRENDE REWARD FOR HVERT TOG / AGENT (07.06.22)
+            # LAG TILHØRENDE REWARD FOR HVERT TOG / AGENT (07.06.22) / OK (06.11.22)
         
         self.counter += 1
         self.reward /= len(self.trains) # REMOVE WHEN NOT IN USE
