@@ -140,13 +140,15 @@ class DDQNAgent(object):
             action_indices = np.dot(action, action_values)
             action_indices = np.array(action_indices, dtype=np.int8)
             
+            
+            
             q_next = self.q_target.predict(new_state, verbose=0)
             q_eval = self.q_eval.predict(new_state, verbose=0)
             
-            q_pred = self.q_eval.predict(state, verbose=0)
+            self.q_pred = self.q_eval.predict(state, verbose=0)
             max_actions = np.argmax(q_eval, axis=1)
             
-            self.q_target1 = q_pred
+            self.q_target1 = self.q_pred
             
             batch_index = np.arange(self.batch_size, dtype=np.int32)
             self.ai = action_indices
@@ -154,6 +156,7 @@ class DDQNAgent(object):
             self.q_target1[batch_index, action_indices] = reward + \
                 self.gamma*q_next[batch_index, max_actions.astype(int)]*done
             
+            self.q_target1 = np.clip(self.q_target1, 0, 1)
             self.history = self.q_eval.fit(state, self.q_target1, verbose=0)
             
             self.epsilon = self.epsilon*self.epsilon_dec if self.epsilon > \

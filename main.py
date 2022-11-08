@@ -114,9 +114,9 @@ for i in range(n_games - counter.n[0]):
     actions = []
     states = []
     states_ = []
-    rewards = []
+    rewards = {name:[] for name in names}
     dones = []
-    speeds = []
+    speeds = {name:[] for name in names}
     distances = []
     losses = {name:[] for name in names}
         
@@ -144,7 +144,6 @@ for i in range(n_games - counter.n[0]):
             
         
 
-
         n = 25
         j = 0
         while j<=n:
@@ -160,19 +159,15 @@ for i in range(n_games - counter.n[0]):
             score += reward
             
             # Save things on the way
-            rewards.append([train.reward for train,_,_ in subwaysystem.trains])
-            speeds.append([train.speed for train,_,_ in subwaysystem.trains])
+            #rewards.append([train.reward for train,_,_ in subwaysystem.trains])
+            _ = [rewards[train.agent.fname].append(train.reward) for train,_,_ in subwaysystem.trains]
+            
+            #speed[train.agent.fname].apeend(train.speed)
+            _ = [speeds[train.agent.fname].append(train.speed) for train,_,_ in subwaysystem.trains]
+            
             distances.append(pdist([train.position for train,_,_ in subwaysystem.trains]))
             
-            if o>n_interact:
-                for train,_,_ in subwaysystem.trains:
-                    if not train.reached_end:
-                        train.agent.remeber(train.save_state, 
-                                            train.action, 
-                                            train.reward,
-                                            train.state, # <- new state_ (new state)
-                                            done)
-                    
+            
             
             #subwaysystem.save_image(o)
             state = state_
@@ -184,7 +179,20 @@ for i in range(n_games - counter.n[0]):
             if subwaysystem.done:
                 done = True
                 j = n + 1
-
+                
+                
+        # Remeber
+        if o>n_interact:
+            for train,_,_ in subwaysystem.trains:
+                if not train.reached_end:
+                    train.agent.remeber(train.save_state, 
+                                            train.action, 
+                                            train.reward,
+                                            train.state, # <- new state_ (new state)
+                                            done)
+                    
+        
+        # Learn
         loss = {}
         if o>n_interact+1:
             for train,_,_ in subwaysystem.trains:
@@ -208,14 +216,16 @@ for i in range(n_games - counter.n[0]):
         #    print(o, [train.speed for train,_,_ in subwaysystem.trains], np.round(reward,3))
         
         if done:
-            reward_h.append(np.sum(np.mean(np.array(rewards), axis=1)))
+            #reward_h.append(np.sum(np.mean(np.array(rewards), axis=1)))
             #print(f"Collisions. Reward: {round(np.sum(np.mean(np.array(rewards), axis=1)),3)}. Last 10 mean: {round(np.mean(reward_h[-10:]),3)}")
             print(f"Done. Amount of steps: {subwaysystem.counter}")
             
         if o>max_interations:
             done = True
-            reward_h.append(np.sum(np.mean(np.array(rewards), axis=1)))
-            print(f"stopper pga maxinteretatoion, reward {round(np.sum(np.mean(np.array(rewards), axis=1)),3)}. Last 10 mean: {round(np.mean(reward_h[-10:]),3)}")
+            #reward_h.append(np.sum(np.mean(np.array(rewards), axis=1)))
+            #rewards_h = 0
+            print("max iter")
+            #print(f"stopper pga maxinteretatoion, reward {round(np.sum(np.mean(np.array(rewards), axis=1)),3)}. Last 10 mean: {round(np.mean(reward_h[-10:]),3)}")
             print(f"Amount of steps: {subwaysystem.counter}")
             subwaysystem.done_flag = "max_iter"
     
@@ -228,7 +238,9 @@ for i in range(n_games - counter.n[0]):
         if len(losses[loss_key]) < longest_list:
             losses[loss_key].extend([None]*(longest_list - len(losses[loss_key])))
             
-    df = pd.DataFrame(losses)
+    df_losses = pd.DataFrame(losses)
+    df_speeds = pd.DataFrame(speeds)
+    df_rewards = pd.DataFrame(rewards)
     
     
     #losses_h.append(np.array(losses))
@@ -240,9 +252,9 @@ for i in range(n_games - counter.n[0]):
     
     #Plot speed, rewards and loss
     fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, ncols=1, figsize=(10,10))
-    ax1.plot(rewards); ax1.set_title("Rewards")
-    ax2.plot(speeds); ax2.set_title("Speeds")
-    ax3.plot(df); ax3.set_title("Losses")
+    sns.lineplot(data=df_speeds, ax=ax1); ax1.set_title("Speeds")
+    sns.lineplot(data=df_rewards, ax=ax2); ax2.set_title("Rewards")
+    sns.lineplot(data=df_losses, ax=ax3); ax3.set_title("Losses")
     plt.show()
     
       
